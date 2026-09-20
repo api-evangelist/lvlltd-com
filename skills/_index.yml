@@ -1,0 +1,23 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  LVL LTD publishes its own Agent Skill at https://lvlltd.com/SKILL.md (frontmatter name lvlltd-x402-shop),
+  which is saved VERBATIM as lvlltd-com-x402-shop.md — the only edit is none. A second, generated skill
+  packages the ESP evaluate -> settle -> prove loop from the OpenAPI, the conventions and the error
+  catalog; because the published spec has no operationIds, its steps cite method + path and the
+  operationIds assigned in overlays/lvlltd-com-openapi-overlay.yaml.
+skills:
+- file: lvlltd-com-x402-shop.md
+  name: lvlltd-x402-shop
+  method: searched
+  source: https://lvlltd.com/SKILL.md
+  fetched: '2026-09-19'
+  http_status: 200
+  api: openapi/lvlltd-com-openapi.yml
+  operations: [getReadiness, getShop, getSkillOutline, getPaymentChallenge, unlockSealedPack, getProofLedger]
+  note: Provider-authored. References /api/recover, /api/find, /install/, /api/networks and /api/bazaar, which are live but absent from the OpenAPI.
+- file: lvlltd-com-esp-evaluate-settle-prove.md
+  name: ESP evaluate, settle and prove a skill purchase
+  method: generated
+  api: openapi/lvlltd-com-openapi.yml
+  operations: [getReadiness, getEspProtocol, searchCatalog, getSkillOutline, getSkillSample, getPaymentChallenge, unlockSealedPack, getProofLedger]

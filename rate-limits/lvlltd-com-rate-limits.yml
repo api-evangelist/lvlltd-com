@@ -1,0 +1,47 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: LVL LTD CO
+providerId: lvlltd-com
+generated: '2026-09-19'
+method: searched
+probe: true
+created: '2026-09-19'
+modified: '2026-09-19'
+sources:
+- https://lvlltd.com/docs/REFERENCE.md#rate-limits-retry-idempotency
+- https://lvlltd.com/api/a2a (dev_patterns.patterns.production.rate_limit; jsonrpc_transport.headers + error_codes)
+- live POST https://lvlltd.com/api/a2a on 2026-09-19 (X-RateLimit-Remaining: 119 observed)
+- live GET https://lvlltd.com/api/catalog on 2026-09-19 (no rate-limit headers observed)
+tags: [Rate Limiting, A2A, x402]
+description: >-
+  LVL LTD publishes one hard limit — the A2A JSON-RPC endpoint at ~120 requests per 60 seconds per
+  isolate, signalled by an X-RateLimit-Remaining response header, HTTP 429 and JSON-RPC code -32005 —
+  and says the REST skill-pay path has "no hard public rate limit on canary path; abuse may be throttled
+  at edge" (Cloudflare). A live REST request carried no RateLimit-* headers; a live A2A request returned
+  X-RateLimit-Remaining: 119, which corroborates the 120/60 s figure. The MCP endpoint documents no limit.
+limit_count: 1
+headers:
+  remaining: X-RateLimit-Remaining
+  requestId: X-Request-Id
+  retryAfter: null
+  note: Headers are emitted by the A2A endpoint only; REST responses expose cf-ray and no limit headers.
+responseCodes:
+  throttled: 429
+  jsonrpc: -32005 RATE_LIMIT
+limits:
+- name: A2A JSON-RPC requests
+  scope: per isolate (Cloudflare Worker instance)
+  endpoint: https://lvlltd.com/api/a2a
+  metric: requests
+  limit: 120
+  timeFrame: 60 seconds
+  burst: null
+  observed: 'X-RateLimit-Remaining: 119 after one request (2026-09-19)'
+undocumented:
+- surface: REST /api/* (pay, catalog, proof, shop ...)
+  note: '"No hard public rate limit on canary path; abuse may be throttled at edge" — no number, no header. Terms section 6 forbids "abuse of rate limits".'
+- surface: MCP /api/mcp
+  note: No limit documented; the agent-memory skill mentions "rate limiting per wallet" as a feature of that paid skill only.
+retry_guidance: 'Exponential backoff 2 s, 4 s, 8 s for transient 5xx and PAYMENT_VERIFICATION_FAILED (retry:true); do not retry terminal A2A tasks.'
+spend_caps: 'Per-wallet spend caps via GET/POST /api/meter (MCP meter_budget) — "Caps prevent runaway agent spend"; paid_api_call is capped at $5 per call.'

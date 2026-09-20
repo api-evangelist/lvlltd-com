@@ -1,0 +1,107 @@
+generated: '2026-09-19'
+method: searched
+source: registry.npmjs.org + pypi.org + github.com/omgawdmadeit1 + https://lvlltd.com/docs/SDK.md + https://lvlltd.com/llms.txt + https://lvlltd.com/api/a2a
+package_count: 5
+official_package_count: 5
+registry_package_count: 0
+summary: >-
+  LVL LTD publishes first-party client libraries, but none of them in a package registry. Five clients
+  are served as raw source files from the provider's own CDN-backed host: four ES modules under
+  https://lvlltd.com/sdk/ (agent-shop, ap2-shopping-agent, a2a-client, a2a-mcp-bridge) and one Python
+  module at /sdk/python/lvl_shop.py. Every URL is UNPINNED — there is no version segment, no registry
+  metadata endpoint and no version constant inside the files — so a consumer cannot tell which build
+  they are importing, and neither can we. The "npx lvl-skills" CLI that the agent card (install_skill),
+  the MCP initialize instructions and llms.txt all advertise does NOT exist on npm
+  (registry.npmjs.org/lvl-skills -> 404, and a full-text npm search for lvlltd returned nothing), so the
+  advertised install path is currently a dangling pointer. The operator's GitHub account holds the
+  site source (lvlltd-skill-marketplace, lvlltd-agentic-marketplace) and one published skill repo
+  (agent-memory), none of which is a client library.
+packages: []
+cdn_distribution:
+- name: agent-shop.mjs
+  language: javascript
+  registry: cdn
+  official: true
+  official_basis: published under the provider's own host and documented verbatim in /docs/SDK.md and /docs/REFERENCE.md
+  url: https://lvlltd.com/sdk/agent-shop.mjs
+  install: 'import { LvlAgentShop } from "https://lvlltd.com/sdk/agent-shop.mjs"'
+  exports: [LvlAgentShop, DEFAULT_BASE]
+  methods: [discovery, shop, shopWithQuery, shopBudget, search, outline, sample, challenge, unlock, recover, proof, contracts, purchases, buyerCredential, verifyCredential, recommendations, coverage, pipelines, priceHistory, statusHistory]
+  version: null
+  published: null
+  version_note: >-
+    Checked, nothing to record. The module URL carries no version and the file declares no version
+    constant; served as application/javascript (13,107 bytes on 2026-09-19). Unpinned: floats to whatever
+    the host currently serves.
+  key_custody: none — the SDK never holds private keys; the caller supplies a verified Base txHash or signs the wallet_next_action locally.
+  docs: https://lvlltd.com/docs/SDK.md
+- name: ap2-shopping-agent.mjs
+  language: javascript
+  registry: cdn
+  official: true
+  official_basis: 'named in the agent card skill ap2_shopping_agent ("SDK: /sdk/ap2-shopping-agent.mjs")'
+  url: https://lvlltd.com/sdk/ap2-shopping-agent.mjs
+  install: 'import { Ap2ShoppingAgent } from "https://lvlltd.com/sdk/ap2-shopping-agent.mjs"'
+  exports: [Ap2ShoppingAgent]
+  version: null
+  published: null
+  version_note: Unpinned URL, no version constant (12,239 bytes on 2026-09-19).
+- name: a2a-client.mjs
+  language: javascript
+  registry: cdn
+  official: true
+  official_basis: named as client_sdk in the GET https://lvlltd.com/api/a2a endpoint description
+  url: https://lvlltd.com/sdk/a2a-client.mjs
+  version: null
+  published: null
+  version_note: 'Unpinned URL (18,092 bytes). The file header says "protocolVersion 1.0.0", which is the A2A protocol version it targets, not a package version.'
+- name: a2a-mcp-bridge.mjs
+  language: javascript
+  registry: cdn
+  official: true
+  official_basis: named as bridge_sdk in the GET https://lvlltd.com/api/a2a endpoint description
+  url: https://lvlltd.com/sdk/a2a-mcp-bridge.mjs
+  version: null
+  published: null
+  version_note: Unpinned URL (4,756 bytes); patterns mcpWrapsA2a and a2aWrapsMcp.
+- name: lvl_shop.py
+  language: python
+  registry: cdn
+  official: true
+  official_basis: linked from llms.txt ("Python SDK") and the agent-setup guide
+  url: https://lvlltd.com/sdk/python/lvl_shop.py
+  install: 'download the file; from lvl_shop import LvlAgentShop (Python 3.10+, stdlib only)'
+  exports: [LvlAgentShop, LvlAgentShopError]
+  version: null
+  published: null
+  version_note: >-
+    Unpinned URL, no __version__; served as application/octet-stream (10,739 bytes). /docs/SDK.md itself
+    hedges that "a thin public/sdk/python/ helper may exist for samples".
+advertised_but_unpublished:
+- name: lvl-skills
+  registry: npm
+  advertised_as: 'npx lvl-skills add <skill_id> --tx 0x...'
+  advertised_in: [a2a agent card skill install_skill, MCP initialize instructions, llms.txt]
+  lookup: https://registry.npmjs.org/lvl-skills
+  status: 404
+  checked: '2026-09-19'
+  note: The CLI the provider tells agents to run after an unlock is not published. cli/ is therefore not emitted.
+registries_searched:
+- {registry: npm, query: 'GET registry.npmjs.org/lvl-skills; search text=lvlltd', first_party_hits: 0, status: '404 / 0 results'}
+- {registry: pypi, query: 'lvl-skills, lvlltd', first_party_hits: 0, status: '404 on both'}
+- {registry: github, query: 'github.com/omgawdmadeit1 (81 public repos); search repositories?q=lvlltd (14 hits, all under omgawdmadeit1)', first_party_hits: 0, note: 'Site source and skill repos, no client library.'}
+- {registry: maven-central, query: not searched, reason: no JVM surface indicated anywhere}
+- {registry: nuget, query: not searched, reason: no .NET surface indicated anywhere}
+- {registry: rubygems, query: not searched, reason: no Ruby surface indicated anywhere}
+- {registry: crates.io, query: not searched, reason: no Rust surface indicated anywhere}
+- {registry: pkg.go.dev, query: not searched, reason: no Go surface indicated anywhere}
+github_org:
+  url: https://github.com/omgawdmadeit1
+  kind: personal account (the operator, Joseph Lamar Taylor), not an organization
+  public_repos: 81
+  related_repos:
+  - {repo: omgawdmadeit1/lvlltd-skill-marketplace, description: 'lvlltd.com Super Aligned Agent Skill Marketplace - Full skill suite live on Cloudflare Pages', pushed: '2026-09-14'}
+  - {repo: omgawdmadeit1/lvlltd-agentic-marketplace, description: 'LVL dual-interface agentic marketplace for lvlltd.com', pushed: '2026-09-19'}
+  - {repo: omgawdmadeit1/agent-memory, description: 'LVL LTD agent-memory skill — persistent wallet-scoped KV for AI agents, x402 per-call USDC on Base', pushed: '2026-09-17'}
+  - {repo: omgawdmadeit1/lvl-factory, description: 'LVL Skill + Music Pack Factory for lvlltd.com / music.lvlltd.com x402 rails', pushed: '2026-09-08'}
+  - {repo: omgawdmadeit1/lvlltd-fleet-console, description: 'LVL LTD fleet console', pushed: '2026-09-13'}

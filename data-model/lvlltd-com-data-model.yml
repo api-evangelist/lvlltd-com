@@ -1,0 +1,98 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived from openapi/lvlltd-com-openapi.yml (the one declared schema, Skill, and the id/wallet/plan
+  parameters on each operation), the live catalog.json row shape (250 rows; fields related_skills,
+  bundles, x402, mcp, a2a, ap2, erc8004, seal), /api/shop bundles, /api/subscribe plans, /api/mandates,
+  /api/proof and /contracts.json as observed on 2026-09-19. No entity is asserted that a live document
+  does not carry.
+description: >-
+  A small commerce graph: 250 Skills (some grouped into Bundles and ordered into Pipelines) are quoted by
+  an x402 Challenge and unlocked into a SealedPack by a Payment (txHash on Base) from a Wallet; each
+  confirmed unlock becomes a ProofRow. A Wallet may hold Subscriptions to Plans, a MeterBudget, AP2
+  Mandates and an optional ERC-8004 AgentIdentity; Judges are Skills that evaluate other Skills.
+entities:
+- name: Skill
+  id_field: id
+  id_form: 'kebab-case slug (e.g. agent-x402-first-buy); also skill_id in query strings'
+  schema: 'openapi/lvlltd-com-openapi.yml#/components/schemas/Skill'
+  key_fields: [id, name, price_usd, price_label, category, summary, x402, protocols, tags, tier, depth_label, quality_score, last_verified, related_skills]
+  source_operations: [getCatalog, searchCatalog, getSkillOutline, getSkillSample]
+- name: Bundle
+  id_field: id
+  id_form: 'bundle-<slug>'
+  key_fields: [id, name, price_usd, members, execution_order, parts_sum_usd, savings_usd, challenge]
+  source_operations: [listBundles, getShop]
+- name: Pipeline
+  id_field: id
+  key_fields: [id, name, steps]
+  source: /api/pipelines (not in the OpenAPI)
+- name: Challenge (x402 quote)
+  id_field: null
+  key_fields: [skill_id, maxAmountRequired, payTo, network, assetContract, accepts, wallet_next_action, guarantee]
+  source_operations: [getPaymentChallenge]
+- name: Payment
+  id_field: txHash
+  id_form: '0x + 64 hex (Base transaction hash)'
+  key_fields: [txHash, skill, amount, payTo, asset]
+  source_operations: [unlockSealedPack]
+- name: SealedPack
+  id_field: null
+  key_fields: [files (path -> text), how_to_use, license.token, sealed_pack_hash]
+  source_operations: [unlockSealedPack]
+- name: ProofRow
+  id_field: txHash
+  key_fields: [skill_id, amount, explorer link, time]
+  source_operations: [getProofLedger, getDemandSignals, getRevenueRollup]
+- name: Wallet
+  id_field: address
+  id_form: '0x + 40 hex (EIP-55 or lower)'
+  source_operations: [resolveAccess, getMeterBudget, listMandates, getAgentIdentity]
+- name: Plan
+  id_field: id
+  id_form: 'snake_case (catalog_live_starter, catalog_live_pro, catalog_live_fleet, update_pass_all_owned, bundle_renew_networking, metered_default)'
+  key_fields: [id, kind, name, interval, price_usd, includes, cancel, challenge]
+  source_operations: [listRecurringPlans]
+- name: Subscription
+  key_fields: [plan_id, wallet, tx_hash, period_end]
+  source_operations: [manageSubscription, resolveAccess]
+- name: MeterBudget
+  key_fields: [wallet, cap_usd, used]
+  source_operations: [getMeterBudget, setMeterCapOrRecordUse]
+- name: Mandate (AP2 IntentMandate)
+  id_field: mandate_id
+  id_form: 'md_…'
+  key_fields: [mandate_id, wallet, limits, signature (EIP-191), status]
+  source_operations: [listMandates, createOrRevokeMandate]
+- name: AgentIdentity (ERC-8004)
+  id_field: address
+  key_fields: [address, registrations, local_reputation]
+  source_operations: [getAgentIdentity]
+- name: Judge
+  note: A Skill whose category is judge/verifier/critic; quality derived only from ProofRows.
+  source_operations: [listJudges]
+- name: TrustScorecard / SecurityScan / EvalScore
+  key_fields: [skill_id, pillars | findings | pass_rate]
+  source_operations: [getTrustScorecards, getSecurityScan, getEvalScores]
+relationships:
+- {from: Skill, to: Skill, type: has_many, via: 'related_skills'}
+- {from: Bundle, to: Skill, type: has_many, via: 'members / execution_order'}
+- {from: Pipeline, to: Skill, type: has_many, via: 'steps'}
+- {from: Skill, to: Challenge, type: has_one, via: 'x402 (challenge URL per row) / GET /api/pay?skill='}
+- {from: Challenge, to: Payment, type: has_one, via: 'payTo + maxAmountRequired settled as txHash'}
+- {from: Payment, to: SealedPack, type: has_one, via: '(txHash, skill) unlock key — idempotent'}
+- {from: Payment, to: ProofRow, type: has_one, via: 'txHash'}
+- {from: ProofRow, to: Skill, type: belongs_to, via: 'skill_id'}
+- {from: Wallet, to: Payment, type: has_many, via: 'paying address (purchases?wallet=)'}
+- {from: Wallet, to: Subscription, type: has_many, via: 'wallet'}
+- {from: Subscription, to: Plan, type: belongs_to, via: 'plan_id'}
+- {from: Wallet, to: MeterBudget, type: has_one, via: 'wallet'}
+- {from: Wallet, to: Mandate, type: has_many, via: 'wallet'}
+- {from: Mandate, to: Payment, type: has_many, via: 'X-AP2-MANDATE presented on POST /api/pay'}
+- {from: Wallet, to: AgentIdentity, type: has_one, via: 'address (additive, never required)'}
+- {from: Judge, to: Skill, type: belongs_to, via: 'is-a Skill (category judge/verifier/critic)'}
+- {from: Skill, to: TrustScorecard / SecurityScan / EvalScore, type: has_one, via: 'skill_id'}
+- {from: Subscription, to: Skill, type: has_many, via: 'access resolution: one_time_unlock > catalog_sub > bundle_renew > meter (resolveAccess)'}
+notes:
+- The OpenAPI declares exactly one schema (Skill); every other entity above is inferred from live JSON documents and the operations' parameters, so field lists are observed, not contractual.
+- 'Treasury and escrow are addresses, not entities: /contracts.json fixes payTo 0x8E51…c4d1 for skill unlocks and a separate LVLEscrow contract 0x9566…7d6 for open-market listings.'

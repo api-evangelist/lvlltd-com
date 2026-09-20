@@ -1,0 +1,10 @@
+Contact: mailto:support@lvlltd.com
+Contact: https://x.com/OmgawdMadeit
+Contact: https://github.com/omgawdmadeit1
+Contact: https://lvlltd.com/security/
+Contact: https://lvlltd.com/support/
+Canonical: https://lvlltd.com/.well-known/security.txt
+Policy: https://lvlltd.com/security/
+Acknowledgments: https://lvlltd.com/operator/
+Preferred-Languages: en
+Expires: 2027-09-11T00:00:00.000Z

@@ -1,0 +1,41 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#agent-registration",
+  "name": "LVL LTD Skill Market",
+  "description": "x402 sealed skill marketplace on Base USDC. Full catalog purchasable via HTTP 402. Identity is additive for buyers.",
+  "image": "https://lvlltd.com/favicon.svg",
+  "endpoints": [
+    {
+      "name": "A2A",
+      "endpoint": "https://lvlltd.com/.well-known/agent.json",
+      "version": "1.0"
+    },
+    {
+      "name": "MCP",
+      "endpoint": "https://lvlltd.com/api/mcp",
+      "version": "2025-06-18"
+    },
+    {
+      "name": "x402",
+      "endpoint": "https://lvlltd.com/api/pay",
+      "version": "2"
+    },
+    {
+      "name": "OpenAPI",
+      "endpoint": "https://lvlltd.com/openapi.json"
+    },
+    {
+      "name": "catalog",
+      "endpoint": "https://lvlltd.com/catalog.json"
+    }
+  ],
+  "supportedTrust": [
+    "reputation",
+    "crypto-economic"
+  ],
+  "x402Support": true,
+  "active": true,
+  "registrations": [],
+  "skill_count": 250,
+  "note": "AgentId registration on Base is operator-opt-in; this URI is the off-chain agent registration file.",
+  "updated_at": "2026-09-16T15:25:54.264Z"
+}

@@ -1,0 +1,62 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://lvlltd.com/openapi.json (info.version), https://lvlltd.com/api/health (version, phases),
+  https://lvlltd.com/api/a2a (versioning block), https://lvlltd.com/terms/ (sections 7 and 12),
+  https://lvlltd.com/support/ (support SLA), https://lvlltd.com/monitors/, https://lvlltd.com/api/ready,
+  https://lvlltd.com/api/status-history, https://lvlltd.com/.well-known/security.txt (Expires),
+  https://lvlltd.com/docs/AGENT-RAILS-2026.md (roadmap).
+versioning:
+  scheme: none-in-url; product version string only
+  current: 1.6.0
+  mechanism: >-
+    The REST API carries no version in the path or a header; info.version in the OpenAPI and
+    /api/health.version both read 1.6.0 (the MCP serverInfo says 1.1.0 and the agent card / server.json
+    say 1.5.0 — three components, three versions). The A2A endpoint expects an A2A-Version: 1.0 request
+    header and answers -32006 VERSION_NOT_SUPPORTED otherwise; MCP is pinned by protocolVersion
+    2025-06-18 in initialize.
+  docs: https://lvlltd.com/docs/REFERENCE.md
+  change_notice: >-
+    Terms section 12: "Material purchase-path changes will be reflected in live API challenges and public
+    docs." The operator's stated contract is that the live 402 challenge is authoritative over any cached
+    documentation.
+deprecation:
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  notes: >-
+    No deprecation or sunset policy is published; RFC 8594 Sunset / Deprecation headers are not used.
+    The only retirement on record is a brand retirement (the LvLX print-on-demand storefront that used to
+    live on this domain, documented at /status/ and /status.json), not an API one. No Deprecation pointer
+    is emitted.
+changelog:
+  url: null
+  notes: >-
+    No dated changelog exists (/changelog, /changelog/, /CHANGELOG.md, /docs/CHANGELOG.md, /api/changelog
+    all 404). Machine documents carry updated_at stamps (catalog.json 2026-09-16, status.json 2026-09-16,
+    about.json 2026-09-11, ai.txt 2026-07-22) but no entry history. No changelog/ artifact is emitted.
+sla:
+  url: https://lvlltd.com/support/
+  uptime_target: null
+  notes: >-
+    Terms section 7 disclaims uptime ("We do not guarantee uninterrupted uptime"); /quality/ says "Uptime
+    or enterprise SLA without a contract" is not claimed. What IS published is a written support SLA:
+    failed paid unlock — same calendar day US Eastern or next business morning after 20:00 ET; security /
+    privacy — first response within 48 hours; product / docs / agent integration — 2 business days;
+    refund decision — within 3 business days after the Base transaction is confirmed. Disputes (open
+    market) ack 24 h, decision 72 h, auto-release 168 h (/api/disputes).
+status_page: https://lvlltd.com/monitors/
+status_machine:
+  readiness: https://lvlltd.com/api/ready
+  history: https://lvlltd.com/api/status-history
+  notes: >-
+    /monitors/ is a public page of live ready checks, funnel decision and last ledger unlock ("Public
+    aggregates only. No IPs, no sessions."). /api/ready is a truthful readiness probe (ready:true only
+    when catalog, challenge_shape, live 402 and sealed-pack rails pass). /api/status-history keeps 168
+    hours of real probes per path with ok_count, uptime_ratio and latency percentiles (on 2026-09-19:
+    /api/pay 20/20 samples ok, uptime_ratio 1). This is a first-party operational status surface, not a
+    third-party status page.
+security_txt_expires: '2027-09-11T00:00:00.000Z'
+roadmap: https://lvlltd.com/docs/AGENT-RAILS-2026.md
+deprecated_operations: []
+phases_declared: {0: foundation, 1: automated-launch, 2: observability, 3: swarm-a2a, 4: grant-readiness, 5: doge-hybrid-optional, final: true, live: true}

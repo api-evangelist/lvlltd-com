@@ -1,0 +1,211 @@
+generated: '2026-09-19'
+method: probed
+source: https://lvlltd.com/.well-known/agent-card.json
+card:
+  file: a2a/lvlltd-com-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: lvlltd.com
+  note: >-
+    Served byte-identical (12,406 bytes) from the canonical /.well-known/agent-card.json and the legacy
+    /.well-known/agent.json on the apex host, and again from studio.lvlltd.com (a Cloudflare Pages sibling
+    that serves the same static well-known files). www.lvlltd.com 301s every path to the apex. The apex is
+    also the OpenAPI servers[] host, the MCP host (/api/mcp) and the A2A JSON-RPC host (/api/a2a). The host
+    is not a catch-all: /.well-known/openid-configuration, /.well-known/oauth-authorization-server and
+    /.well-known/ai-plugin.json return real 404s, and a negative-control path under /.well-known/ 404s
+    too. Ownership is not in question: provider.organization is "LVL LTD CO" with provider.url
+    https://lvlltd.com, the OpenAPI on the same host titles itself "LVL LTD Agent Skill Market API" with
+    contact LVL LTD CO, and the Terms of Service name the A2A and MCP machine APIs (section 1 and 6).
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://lvlltd.com/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 12406
+  body_parses_as: JSON object with AgentCard shape (name, url, version, protocolVersion, capabilities, skills, provider, preferredTransport, defaultInputModes, defaultOutputModes, supportedInterfaces, securitySchemes, signatures)
+  corroborating_probes:
+  - url: https://lvlltd.com/.well-known/agent.json
+    http_status: 200
+    note: Legacy path; identical body (diff clean).
+  - url: https://studio.lvlltd.com/.well-known/agent-card.json
+    http_status: 200
+    note: Same 12,406-byte card served from the studio sibling host.
+  - url: https://www.lvlltd.com/.well-known/agent-card.json
+    http_status: 301
+    note: Redirects to the apex.
+  - url: https://lvlltd.com/api/a2a
+    http_status: 200
+    note: >-
+      GET returns a JSON description of the endpoint (protocol a2a-jsonrpc, protocolVersion 1.0.0,
+      methods message/send, tasks/send, tasks/get, tasks/cancel, tasks/list,
+      agent/getAuthenticatedExtendedCard; multi-turn max 8 turns, TTL 1800 s; rate limit 120 requests per
+      60 s; X-Request-Id / X-RateLimit-Remaining response headers).
+  - url: https://lvlltd.com/api/a2a
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tasks/get","params":{"id":"apievangelist-nonexistent-probe"}}'
+    note: See probe log in the enrichment report; no message was sent and nothing was purchased.
+  - url: https://lvlltd.com/.well-known/jwks.json
+    http_status: 200
+    note: One Ed25519 OKP key, kid lvl-a2a-1, alg EdDSA, use sig — the key the card's signatures[] block names.
+  - url: https://swarm.lvlltd.com/.well-known/agent-card.json
+    http_status: 200
+    note: >-
+      A DIFFERENT card (see x-additional-cards below) on the swarm worker host; saved to
+      well-known/lvlltd-com-swarm-agent-card.json, not graded as the primary card.
+  - url: https://a2aregistry.org
+    note: >-
+      The provider entered the harvest backlog from an a2a-registry listing; the card above was fetched
+      directly from the provider's host, not from the registry.
+agent_card:
+  name: LVL LTD Skill Market Agent
+  description: >-
+    LVL LTD CO operates lvlltd.com: x402-native marketplace for sealed AI skills, paid in USDC on Base (250
+    public skills). Free outlines before pay; confirmed purchases on public /api/proof only. Payment settles
+    via x402 HTTP, not inside A2A JSON-RPC. Optional AP2 mandates and ERC-8004 identity are additive.
+  url: https://lvlltd.com/api/a2a
+  version: 1.5.0
+  protocol_version: 1.0.0
+  preferred_transport: JSONRPC
+  provider:
+    organization: LVL LTD CO
+    url: https://lvlltd.com
+  documentation_url: https://lvlltd.com/about/
+  icon_url: https://lvlltd.com/favicon.svg
+  capabilities:
+    streaming: false
+    push_notifications: false
+    state_transition_history: false
+    extended_agent_card: false
+  supported_interfaces:
+  - {url: https://lvlltd.com/api/a2a, protocolBinding: JSONRPC, protocolVersion: '1.0'}
+  additional_interfaces:
+  - {url: https://lvlltd.com/api/a2a, transport: JSONRPC}
+  - {url: https://lvlltd.com/api/mcp, transport: HTTP+JSON, protocol: mcp}
+  - {url: https://lvlltd.com/api/shop, transport: HTTP+JSON}
+  - {url: https://lvlltd.com/api/pay, transport: HTTP+JSON, payment: x402}
+  - {url: https://lvlltd.com/catalog.json, transport: HTTP+JSON}
+  default_input_modes: [text/plain, application/json]
+  default_output_modes: [application/json, text/plain]
+  security_schemes:
+    x402_http: {type: apiKey, in: header, name: X-PAYMENT, purpose: x402 payment proof after a 402 challenge and a Base USDC transfer}
+    ap2_mandate: {type: apiKey, in: header, name: X-AP2-MANDATE, purpose: optional AP2 spend mandate for verified_authorized_purchase}
+  security: []
+  supports_authenticated_extended_card: false
+  extensions:
+  - https://lvlltd.com/protocols.json#a2a-marketplace-agent
+  - https://lvlltd.com/api/mcp
+  - https://ap2-protocol.org/extension/v1
+  - https://lvlltd.com/protocols.json#ap2
+  - https://github.com/google-agentic-commerce/a2a-x402
+  - https://lvlltd.com/.well-known/erc8004-agent.json
+  - https://lvlltd.com/catalog.json
+  - https://lvlltd.com/about.json
+  signatures:
+    scheme: jws
+    alg: EdDSA
+    kid: lvl-a2a-1
+    jwks: https://lvlltd.com/.well-known/jwks.json
+    signed_at: '2026-07-28T15:23:26.385Z'
+    stated_method: JWS over JCS(card without signatures)
+  skill_count: 11
+  skills:
+  - {id: search_catalog, name: Search skill catalog, tags: [discovery, catalog, x402, mcp]}
+  - {id: get_skill_details, name: Get skill details, tags: [discovery, evaluation]}
+  - {id: quote_price, name: Quote x402 price, tags: [commerce, x402, quote]}
+  - {id: initiate_x402_purchase, name: Purchase skill (x402), tags: [commerce, x402, purchase, ap2]}
+  - {id: ap2_spending_mandate, name: AP2 spending mandate (A2A DataPart), tags: [ap2, mandate, a2a-extension, commerce]}
+  - {id: ap2_shopping_agent, name: AP2 Shopping Agent (buyer orchestrator), tags: [ap2, shopping-agent, orchestrator, commerce]}
+  - {id: agent_explainability, name: Agent explainability (reasoning traces), tags: [xai, explainability, audit, governance]}
+  - {id: verify_unlock, name: Verify purchase, tags: [trust, proof]}
+  - {id: install_skill, name: Install unlocked skill, tags: [install, skills]}
+  - {id: lookup_agent_identity, name: ERC-8004 agent identity, tags: [identity, erc-8004]}
+  - {id: commerce_signals, name: Commerce demand signals, tags: [trust, signals]}
+  - {id: mcp_bridge, name: MCP catalog tools, tags: [mcp, discovery]}
+  skill_invocation: >-
+    Every skill's examples[] points at a plain HTTP surface (GET /api/catalog, GET /api/pay?skill=, POST
+    /api/pay with X-PAYMENT, GET /api/proof, POST /api/mcp tools/list) or an A2A message/send with a
+    TextPart or a DataPart (spending_mandate / intent_mandate). The skills describe how to use the
+    marketplace; they are not themselves the 250 purchasable catalog skills.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '1.0.0'
+  preferred_transport: JSONRPC
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_fields:
+    default_input_modes: true
+    default_output_modes: true
+    preferred_transport: true
+  grade_basis: >-
+    Graded against the A2A 1.0.0 hard checks. capabilities is an OBJECT (pass) with streaming,
+    pushNotifications, stateTransitionHistory and extendedAgentCard. protocolVersion is present at the
+    top level (pass), declared "1.0.0". skills is an ARRAY (pass) of eleven fully-populated skills, each
+    with id, name, description, tags, examples, inputModes and outputModes. All three optional
+    discriminators are present: preferredTransport (JSONRPC), defaultInputModes and defaultOutputModes.
+    The card carries BOTH the 1.0.0 supportedInterfaces[] block (url + protocolBinding + protocolVersion)
+    and the older top-level url/preferredTransport triple, so readers written against either revision
+    find what they look for.
+  deviations:
+  - field: supportedInterfaces[0].protocolVersion vs protocolVersion
+    observed: "'1.0' inside the interface, '1.0.0' at the top level"
+    note: Two spellings of the same version in one document. Harmless to a lenient reader, but a strict semver comparison of the two fields fails.
+  - field: additionalInterfaces[]
+    observed: five entries mixing an A2A interface with MCP, REST shop, x402 pay and catalog.json URLs, each carrying non-standard keys (protocol, payment, note)
+    note: >-
+      A2A additionalInterfaces is meant for alternative transports of the SAME agent. Here it is used as a
+      general discovery list for the provider's other protocols, which is useful but not what the field
+      means; a client iterating it as A2A transports will try to speak JSON-RPC to /api/shop.
+  - field: extensions[]
+    observed: declared at the top level rather than under capabilities.extensions, and only one of eight URIs (https://ap2-protocol.org/extension/v1) is an A2A extension identifier; the rest are documentation pointers
+    note: A 1.0.0 reader looks for capabilities.extensions[]; it will see none and treat the AP2 extension as absent.
+  - field: security / securitySchemes
+    observed: security is an empty array; the two securitySchemes describe payment-proof headers (X-PAYMENT, X-AP2-MANDATE) typed as apiKey
+    note: >-
+      Access is economic, not credential-based: discovery is anonymous and money moves over x402 on
+      /api/pay, never inside A2A. The apiKey typing is a stretch (the header carries a transaction hash or
+      a signed payment payload, not a key), but it is an honest description of where the proof goes.
+  - field: signatures[] / signatureMeta
+    observed: one EdDSA JWS (kid lvl-a2a-1, JWKS published) signedAt 2026-07-28, plus a non-standard signatureMeta block whose note describes the operator's re-signing procedure and private-key file name
+    note: >-
+      A signed card with a resolvable JWKS is rare and good. The signedAt predates the later body edits
+      the note itself describes ("Body updated for AP2 ... re-sign"), and our verification attempt over
+      JCS(card without signatures) is recorded in the enrichment report; treat the signature as
+      published-but-unverified-by-us rather than proven.
+  - field: catalogSkillCount / inventory / about
+    observed: non-standard top-level fields
+    note: Extra fields are permitted; recorded so a strict schema validator's complaint is expected.
+x-additional-cards:
+- host: swarm.lvlltd.com
+  url: https://swarm.lvlltd.com/.well-known/agent-card.json
+  http_status: 200
+  file: well-known/lvlltd-com-swarm-agent-card.json
+  name: LVL LTD x402 Skill Market
+  url_in_card: https://swarm.lvlltd.com
+  version: 1.0.0
+  grade: flavored
+  deviations: [no-protocolVersion, url-is-a-host-root-not-a-JSON-RPC-endpoint, skills-carry-x402-challenge-blocks]
+  note: >-
+    A second, older-shaped card on the swarm worker (22 skills, provider.organization "LVL LTD"). It fails
+    the protocolVersion hard check. Its x402 blocks name payTo 0xa00876513baa433ce2b58a5341fd06d2b6f9a6ed,
+    which the apex host's /contracts.json lists under banned_do_not_pay as the prior production treasury
+    rotated 2026-08-09 ("keys not operator-accessible; never skill payTo"). An agent that discovers the
+    swarm card first and pays what it says would pay an address the operator says is dead. Recorded here
+    as a finding; the primary card above is the one wired into apis.yml.
+- host: studio.lvlltd.com
+  url: https://studio.lvlltd.com/.well-known/agent-card.json
+  http_status: 200
+  note: Byte-identical copy of the primary card; not a separate agent.
+surface_relationship:
+  note: >-
+    LVL publishes four agent surfaces on one host and they are projections of one catalog. A2A: eleven
+    marketplace-operation skills at https://lvlltd.com/api/a2a. MCP: 59 tools at https://lvlltd.com/api/mcp,
+    five of which (a2a_discover, a2a_message_send, a2a_tasks_get, a2a_tasks_cancel, a2a_bridge_info) wrap
+    the A2A endpoint, and a2a_bridge_info documents the reverse wrap. REST: 32 operations, of which GET
+    /api/pay (402 challenge) and POST /api/pay (X-PAYMENT unlock) are the only operations that move value,
+    and every A2A purchase skill and paid MCP tool ultimately routes there (see
+    mcp/lvlltd-com-tool-crosswalk.yml). The ERC-8004 registration file at /.well-known/erc8004-agent.json
+    lists all four endpoints under one agent name.

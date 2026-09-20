@@ -1,0 +1,49 @@
+# ai.txt — machine policy for AI systems (lvlltd.com)
+# Spec-inspired: plain text rules for crawlers, agents, and training systems.
+
+site: https://lvlltd.com
+brand: LVL LTD CO
+product: x402 Agent Skill Marketplace
+updated: 2026-07-22
+
+# Preferred discovery (use these first)
+preferred:
+  - https://lvlltd.com/llms.txt
+  - https://lvlltd.com/llms-full.txt
+  - https://lvlltd.com/agent.json
+  - https://lvlltd.com/.well-known/agent.json
+  - https://lvlltd.com/catalog.json
+  - https://lvlltd.com/api/shop
+  - https://lvlltd.com/api/proof
+  - https://lvlltd.com/openapi.json
+  - https://lvlltd.com/schema/products.jsonld
+  - https://lvlltd.com/listings/
+  - https://lvlltd.com/status.json
+
+# Commerce rules for autonomous agents
+commerce:
+  protocol: x402
+  network: base
+  chain_id: 8453
+  asset: USDC
+  free_eval: /skills/{id}/outline.json
+  pay: GET /api/pay?skill={id} → HTTP 402 → transfer USDC → POST X-PAYMENT
+  never_invent_volume: true
+  proof_only: /api/proof
+
+# Content use
+search: allow
+ai-input: opt-out for training corpora unless licensed
+ai-train: no
+summarization: allow with attribution to lvlltd.com
+citation: required for stats — use /api/proof only
+
+# Brand disambiguation
+not:
+  - LvLX merch
+  - print-on-demand / leggings store
+canonical_status: https://lvlltd.com/status.json
+
+# Contact
+contact: https://lvlltd.com/about/
+security: https://lvlltd.com/.well-known/security.txt

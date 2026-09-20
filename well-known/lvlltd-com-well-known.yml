@@ -1,0 +1,234 @@
+generated: '2026-09-19'
+method: probed
+source: live GET of the named /.well-known/ paths (plus /apis.json, /apis.yml, /llms.txt, /openapi.json) on every host the record knows, 2026-09-19
+summary: >-
+  lvlltd.com serves a rich discovery surface from the apex host, which is also the OpenAPI servers[] host,
+  the MCP host and the A2A host: security.txt (RFC 9116, Policy + Expires 2027-09-11), an RFC 9728
+  oauth-protected-resource document, an api-catalog (RFC 9727-style Link lines served as text/plain),
+  an A2A agent card at both the canonical and legacy paths, a JWKS, an x402 discovery document, an
+  ERC-8004 registration file and llms.txt — and it returns real 404s (no SPA shell) for
+  openid-configuration, oauth-authorization-server, ai-plugin.json, ucp/acp/aauth, apis.json and a
+  negative-control path. The oauth-protected-resource document names https://lvlltd.com as its
+  authorization server, yet that same host publishes no RFC 8414 or OIDC discovery — the delegated-
+  identity chain is declared but dangling. www 301s to the apex; studio.lvlltd.com mirrors the apex
+  files byte-for-byte; swarm.lvlltd.com serves its own, different agent card; music.lvlltd.com serves
+  none of them.
+path_echo_control: passed
+negative_control:
+  path: /.well-known/lvlltd-com-negative-control-dd790ec3.json
+  results: {lvlltd.com: 404, studio.lvlltd.com: 404, swarm.lvlltd.com: 404, music.lvlltd.com: 404}
+hit_count: 10
+hosts:
+- host: https://lvlltd.com
+  role: apex; OpenAPI servers[] host; MCP host (/api/mcp); A2A host (/api/a2a); authorization_servers[0] named by oauth-protected-resource
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: lvlltd-com-security.txt
+    note: 'RFC 9116: Contact (mailto:support@lvlltd.com + X + GitHub + /security/ + /support/), Canonical, Policy https://lvlltd.com/security/, Acknowledgments, Preferred-Languages en, Expires 2027-09-11.'
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    note: The host is named as authorization_servers[0] by its own oauth-protected-resource document; RFC 8414 metadata is absent, so no client can discover a token endpoint or the scopes the resource document lists.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: lvlltd-com-oauth-protected-resource.json
+    note: 'RFC 9728: resource https://lvlltd.com, authorization_servers [https://lvlltd.com], scopes_supported [agent:read, agent:execute, x402:pay, openid], bearer_methods_supported [header], resource_name "LVL LTD Agent Marketplace API".'
+  - path: /.well-known/api-catalog
+    status: 200
+    file: lvlltd-com-api-catalog.txt
+    note: Served as text/plain lines of RFC 8288 Link headers (rel service-desc, status, alternate, item, payment, collection, describedby, agent-card, jwks, about) rather than the RFC 9727 application/linkset+json media type.
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: ../a2a/lvlltd-com-agent-card.json
+    note: A2A 1.0.0 agent card, Ed25519-JWS signed; graded conformant in a2a/lvlltd-com-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 200
+    file: ../a2a/lvlltd-com-agent-card.json
+    note: Legacy path; byte-identical to agent-card.json.
+  - path: /.well-known/jwks.json
+    status: 200
+    file: lvlltd-com-jwks.json
+    note: One OKP/Ed25519 key, kid lvl-a2a-1, alg EdDSA, use sig.
+  - path: /.well-known/x402
+    status: 200
+    file: lvlltd-com-x402.json
+    note: 'x402 v2 discovery: payTo, network eip155:8453, USDC asset contract, resources[] (three challenge URLs), discovery links (shop, catalog, proof, mcp, SKILL.md, openapi).'
+  - path: /.well-known/erc8004-agent.json
+    status: 200
+    file: lvlltd-com-erc8004-agent.json
+    note: EIP-8004 agent-registration file naming the A2A, MCP, x402, OpenAPI and catalog endpoints; registrations [] (no on-chain agentId claimed).
+  - path: /.well-known/llms.txt
+    status: 200
+    file: ../llms/lvlltd-com-llms.txt
+    note: Identical to /llms.txt (6,535 bytes).
+  - path: /.well-known/mcp.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    file: ../llms/lvlltd-com-llms.txt
+  - path: /llms-full.txt
+    status: 200
+    note: 83,072 bytes. Saved locally as llms/lvlltd-com-llms-full.txt, which is gitignored (*-llms-full.txt) by contract.
+  - path: /openapi.json
+    status: 200
+    file: ../openapi/_original/lvlltd-com-openapi.json
+  - path: /robots.txt
+    status: 200
+    file: lvlltd-com-robots.txt
+    note: 'Carries a Content-Signal line: ai-train=no, search=yes, ai-input=yes. Disallows /ops, /dashboard, /profit.'
+  - path: /ai.txt
+    status: 200
+    file: lvlltd-com-ai.txt
+    note: Plain-text AI policy (preferred discovery list, commerce rules, ai-train no, citation rule).
+- host: https://www.lvlltd.com
+  role: www alias
+  documents:
+  - path: /.well-known/security.txt
+    status: 301
+    note: Every probed path 301s to https://lvlltd.com/<same path>; nothing is served from www itself.
+  - path: /.well-known/openid-configuration
+    status: 301
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+  - path: /.well-known/oauth-protected-resource
+    status: 301
+  - path: /.well-known/api-catalog
+    status: 301
+  - path: /.well-known/ai-plugin.json
+    status: 301
+  - path: /.well-known/agent-card.json
+    status: 301
+  - path: /.well-known/agent.json
+    status: 301
+- host: https://studio.lvlltd.com
+  role: sibling Cloudflare Pages host named in /api/health (studio_human); serves the apex well-known files verbatim
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: lvlltd-com-security.txt
+    note: Byte-identical to the apex file.
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: lvlltd-com-oauth-protected-resource.json
+    note: Byte-identical to the apex file (resource still https://lvlltd.com).
+  - path: /.well-known/api-catalog
+    status: 200
+    file: lvlltd-com-api-catalog.txt
+    note: Byte-identical to the apex file.
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: ../a2a/lvlltd-com-agent-card.json
+    note: Byte-identical to the apex card.
+  - path: /.well-known/agent.json
+    status: 200
+    file: ../a2a/lvlltd-com-agent-card.json
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+- host: https://swarm.lvlltd.com
+  role: swarm skill worker named in /api/health and llms.txt; a Cloudflare Worker returning JSON 404s
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: lvlltd-com-swarm-agent-card.json
+    note: A different card (22 swarm skills, no protocolVersion, payTo the apex contracts.json bans) — see a2a/lvlltd-com-a2a.yml x-additional-cards.
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /openapi.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+- host: https://music.lvlltd.com
+  role: sister music library named in /api/health and llms.txt
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+- host: https://brain.lvlltd.com
+  role: named in /api/health (brain_subdomain) — DNS does not resolve
+  documents:
+  - path: /.well-known/security.txt
+    status: 0
+    note: NXDOMAIN on 2026-09-19; /api/health itself says the brain DNS is created on demand by a zone-API call. Nothing probed further.

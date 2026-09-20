@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "x402Version": 2,
+  "schema": "lvl-x402-well-known-v1",
+  "site": "https://lvlltd.com",
+  "serviceName": "LVL LTD",
+  "description": "x402 agent skill marketplace on Base USDC. Free outline first. Sealed pack after verified payment.",
+  "ownershipProofs": ["0x8E51309870394f79574452A52A3c916622f0c4d1"],
+  "payTo": "0x8E51309870394f79574452A52A3c916622f0c4d1",
+  "network": "eip155:8453",
+  "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "resources": [
+    "https://lvlltd.com/api/pay?skill=agent-x402-first-buy",
+    "https://lvlltd.com/api/pay?skill=aie-premium-access-token",
+    "https://lvlltd.com/api/pay?skill=lvl-agent-revenue-os-pack"
+  ],
+  "discovery": {
+    "shop": "https://lvlltd.com/api/shop",
+    "catalog": "https://lvlltd.com/catalog.json",
+    "find": "https://lvlltd.com/api/find",
+    "proof": "https://lvlltd.com/api/proof",
+    "mcp": "https://lvlltd.com/api/mcp",
+    "skill_md": "https://lvlltd.com/SKILL.md",
+    "openapi": "https://lvlltd.com/openapi.json"
+  },
+  "instructions": "GET /api/pay?skill=<id> returns HTTP 402. Settle USDC on Base to payTo, then POST /api/pay with X-PAYMENT. Success truth is GET /api/proof only."
+}

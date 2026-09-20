@@ -1,0 +1,186 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://lvlltd.com/docs/REFERENCE.md ("Rate limits, retry, idempotency", "Challenge shape", "Unlock
+  response", "Reorg handling", "Recover flow"), https://lvlltd.com/how-to/agent-setup/,
+  https://lvlltd.com/api/a2a (dev_patterns.patterns: idempotency, observability, versioning, security,
+  production), https://lvlltd.com/api/x402, https://lvlltd.com/terms/ (section 3), https://lvlltd.com/refunds/,
+  https://lvlltd.com/api/subscribe, https://lvlltd.com/api/mandates, catalog.json pagination block, and
+  the live responses observed on 2026-09-19.
+description: >-
+  How LVL LTD's surfaces behave across operations: anonymous reads, x402 payment proof instead of
+  authentication, unlock idempotency keyed on the settled transaction, offset pagination with ETags, a
+  custom error envelope, A2A request tracing and rate-limit headers, and what can and cannot be reversed
+  once USDC has moved.
+base_url: https://lvlltd.com
+api_style: REST over HTTPS with JSON, plus JSON-RPC 2.0 at /api/mcp and /api/a2a; HTTP 402 is a first-class response, not an error
+
+authentication:
+  scheme: none for discovery and free evaluation; x402 payment proof for unlocks
+  headers:
+  - 'X-PAYMENT (JSON {txHash, skill})'
+  - 'PAYMENT-SIGNATURE (EIP-3009 typed-data signature for the CDP facilitator path)'
+  - 'X-AP2-MANDATE (optional AP2 mandate id / IntentMandate)'
+  - 'X-CAPABILITY (short-lived capability token; MCP get_capability_info)'
+  api_keys: none ("Wallet-native buy — no API key required for first-party unlocks")
+  detail: authentication/lvlltd-com-authentication.yml
+
+idempotency:
+  supported: true
+  coverage: partial
+  mechanism: >-
+    Unlock key = the verified pair (txHash, skill). Re-POSTing /api/pay (or /api/recover) with the same
+    X-PAYMENT returns the same sealed pack and does not double-charge — "One tx -> permanent access".
+    A2A message/send is idempotent on message.messageId (and X-Request-Id) for 300 s: a duplicate returns
+    the cached task.
+  scope:
+  - POST /api/pay (unlockSealedPack) — keyed on txHash + skill; no expiry ("same tx re-downloads forever")
+  - POST /api/recover — same key; "does not move funds"
+  - POST /api/a2a message/send — keyed on message.messageId / X-Request-Id, TTL 300 s
+  not_covered:
+  - POST /api/subscribe (start/renew/cancel) — no documented replay protection beyond the on-chain txHash
+  - POST /api/meter (set cap / record use)
+  - POST /api/mandates (create/revoke)
+  - POST /api/mcp tools/call for paid tools (purchase_skill inherits the /api/pay key; runtime tools such as memory_remember do not document one)
+  header: none — there is no Idempotency-Key header anywhere; the idempotency is a property of the payment proof
+  retention: unbounded for unlocks (terms section 3 "Re-download"); 300 s for A2A
+  docs: https://lvlltd.com/docs/REFERENCE.md#rate-limits-retry-idempotency
+
+reversibility:
+  grade: documented
+  read_only: false
+  summary: >-
+    USDC transfers on Base are final at the protocol layer and the terms say "No chargebacks on completed
+    on-chain transfers". On top of that the operator publishes a written refund promise with named
+    conditions, a one-step subscription cancel, mandate revocation and A2A task cancellation. No API
+    operation reverses an unlock; refunds are a support workflow, so the surface is documented but only
+    the cancel paths are self-service.
+  surfaces:
+  - write: POST /api/pay (unlockSealedPack) — one-time skill unlock
+    reversal: none in the API. Refund is a manual request via /support/ or an X DM with the BaseScan link, skill id, tx hash and paying wallet.
+    conditions_verbatim:
+    - Payment confirmed on Base but sealed pack failed to unlock, and /recover/ cannot deliver the files.
+    - You were charged twice for the same skill id (duplicate settle). We refund the extra transfer.
+    - Wrong amount sent above the listed price with no unlock issued — we return the overage, minus Base gas we cannot recover.
+    - Operator error (wrong pack files shipped for that skill id).
+    not_refunded_verbatim:
+    - Buyer's remorse after a successful unlock (you already have the sealed files; same tx re-downloads forever).
+    - Skill did not match a hoped-for outcome after you read the free outline.
+    - Gas spent on Base (ETH). Payments sent to the wrong address or the wrong chain.
+    window: 'Decision within 3 business days after the tx is confirmed. Approved refunds go back in USDC on Base to the original paying address only.'
+    window_note: The stated window is the operator's decision time; no deadline for the buyer to ask is published.
+    docs: https://lvlltd.com/refunds/
+    guarantee: 'Delivery guarantee (402 body guarantee block): if a verified payment to the canonical payTo does not yield sealed_pack.files after POST /api/pay or /api/recover, the operator refunds that unlock. Not a profit, income or uptime guarantee.'
+  - write: POST /api/subscribe (manageSubscription) — recurring plan
+    reversal: POST /api/subscribe action=cancel (MCP subscribe_plan action=cancel)
+    window: 'Cancel in one POST — access through period end. One-time unlocks already bought are never revoked by a subscription lapse.'
+    docs: https://lvlltd.com/pricing/
+  - write: POST /api/mandates (createOrRevokeMandate) — AP2 spend mandate
+    reversal: POST /api/mandates with the revoke action ("Create/revoke AP2 mandate" in the OpenAPI)
+    window: not stated
+    docs: https://lvlltd.com/api/mandates
+  - write: POST /api/a2a message/send — multi-turn task
+    reversal: tasks/cancel (-32002 TASK_NOT_CANCELABLE once terminal)
+    window: 'Tasks live 1800 s (task_ttl_sec); terminal states completed|failed|canceled|rejected cannot be re-entered.'
+    docs: https://lvlltd.com/api/a2a
+  - write: POST /api/meter (setMeterCapOrRecordUse)
+    reversal: the cap can be re-set; recorded use is not reversible
+    window: not stated
+  - write: open-market escrow (LVLEscrow, not a skill unlock)
+    reversal: escrow refund to original payer via /api/disputes
+    window: 'ack 24 h, decision 72 h, auto-release 168 h (/api/disputes sla)'
+    docs: https://lvlltd.com/api/disputes
+  dry_run: >-
+    The free Evaluate phase (outline.json, sample.md, GET /api/pay 402 quote, /api/esp?phase=evaluate) is
+    the rehearsal surface; no write can be dry-run. The $0.05 canary skill is a REAL micropayment for
+    proving the rails, not a sandbox.
+
+pagination:
+  style: offset
+  request_params:
+    limit: '/api/catalog and /catalog.json (omit for the full catalog); MCP list_all_skills limit default 50, max 200'
+    offset: 'MCP list_all_skills offset default 0; catalog.json pagination.offset'
+  response_fields:
+    total: total rows
+    offset: current offset
+    limit: page size
+    count: rows returned
+    next_offset: null when exhausted
+    next_cursor: always null (no cursor pagination)
+  caching: 'catalog.json supports ETag + If-None-Match -> 304'
+  docs: https://lvlltd.com/catalog.json (pagination block)
+
+field_expansion:
+  supported: false
+  note: '/api/music-catalog accepts ?fields=meta for a metadata-only response; the skill catalog has no sparse-field or expand mechanism.'
+
+metadata:
+  supported: false
+
+request_tracing:
+  request_id_header: X-Request-Id
+  scope: 'A2A JSON-RPC (/api/a2a) — echoed in the response and in Task.metadata.requestId; observed live (X-Request-Id: 1 echoed on 2026-09-19)'
+  rest_note: REST responses carry no request-id header (observed on /api/catalog); the Cloudflare cf-ray header is the only correlation id.
+  explainability_header: X-Agent-Explainability (POST /api/explain; not in the OpenAPI)
+
+versioning:
+  scheme: product version only (1.6.0); no URL or header versioning on REST
+  a2a: 'A2A-Version: 1.0 request header; -32006 VERSION_NOT_SUPPORTED'
+  mcp: protocolVersion 2025-06-18
+  detail: lifecycle/lvlltd-com-lifecycle.yml
+
+error_envelope:
+  media_type: application/json
+  rfc9457: false
+  shape: '{ "ok": false, "error", "error_code", "message", "retry"?, "tip"? }'
+  jsonrpc: 'JSON-RPC 2.0 error objects on /api/mcp and /api/a2a (HTTP 200 with error body; 400 parse error; 429 rate limit)'
+  detail: errors/lvlltd-com-problem-types.yml
+  docs: https://lvlltd.com/docs/REFERENCE.md#error-codes
+
+rate_limits:
+  signal_status: 429
+  response_headers: [X-RateLimit-Remaining (A2A only; observed 119 after one request)]
+  jsonrpc_code: -32005 RATE_LIMIT
+  detail: rate-limits/lvlltd-com-rate-limits.yml
+  docs: https://lvlltd.com/docs/REFERENCE.md#rate-limits-retry-idempotency
+
+retry:
+  policy: 'Transient 5xx and PAYMENT_VERIFICATION_FAILED with retry:true -> exponential backoff 2 s, 4 s, 8 s, max ~30 s after broadcast; do not retry A2A tasks in a terminal state; ready:false means do not buy.'
+  reorg: 'Verification is a multi-RPC Base log scan; prefer >=1 confirmation before the first POST; a reorged tx fails verification and must be re-paid only if the explorer shows failure — never invent a refund.'
+
+payment_challenge_shape:
+  status: 402
+  headers: [PAYMENT-REQUIRED, X-PAYMENT-REQUIRED]
+  body_fields:
+  - x402Version
+  - maxAmountRequired | amount (atomic USDC, 6 decimals)
+  - payTo
+  - network base / eip155:8453
+  - asset USDC
+  - assetContract
+  - skill | skill_id
+  - error_code PAYMENT_REQUIRED
+  - outline
+  - sample
+  - 'accepts[]'
+  - wallet_next_action
+  - guarantee
+  - recover
+  rule: 'Agents MUST accept top-level fields OR accepts[0].*; compare payTo case-insensitively (EIP-55); never hard-code payTo or amounts.'
+  validation: 'GET /api/ready checks[] challenge_shape + challenge_live_402'
+
+cors:
+  allow_origin: '*'
+  allow_headers_on_pay: [Content-Type, Payment-Signature, X-Payment, X-PAYMENT, X-PAYMENT-ASSET, X-AP2-MANDATE, X-CAPABILITY, Authorization]
+  expose_headers_on_pay: [PAYMENT-REQUIRED, X-PAYMENT-REQUIRED]
+  note: Browser agents can call the pay path directly; observed on 2026-09-19.
+
+other_conventions:
+- name: Amounts
+  detail: Atomic USDC strings with 6 decimals ($0.05 -> "50000"); price_usd floats appear in catalog rows for humans.
+- name: Success truth
+  detail: 'Only GET /api/proof rows count as confirmed unlocks; every document repeats "never invent volume".'
+- name: Free evaluation first
+  detail: outline.json and sample.md are always public; the ESP invariant free_eval_always is asserted by /api/esp and checked by /api/ready.
+- name: Canonical treasury
+  detail: 'payTo 0x8E51309870394f79574452A52A3c916622f0c4d1 per /contracts.json; two legacy addresses are listed under banned_do_not_pay — including the one the swarm.lvlltd.com agent card still advertises.'

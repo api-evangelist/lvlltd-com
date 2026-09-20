@@ -1,0 +1,63 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "com.lvlltd/skill-market",
+  "description": "Search lvlltd.com x402 skill catalog, fetch free outlines, get 402 payment challenges, and unlock sealed packs after Base USDC payment. Payment is never bypassed.",
+  "version": "1.5.0",
+  "websiteUrl": "https://lvlltd.com",
+  "repository": {
+    "url": "https://github.com/lvlltd/lvlltd-agent-marketplace",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://lvlltd.com/api/mcp"
+    }
+  ],
+  "_lvl_extensions": {
+    "json_rpc_http": "https://lvlltd.com/api/mcp",
+    "protocolVersion": "2025-06-18",
+    "tools": [
+      "search_skills",
+      "list_all_skills",
+      "intent_search",
+      "get_skill_details",
+      "get_security_scan",
+      "get_eval_score",
+      "quote_price",
+      "quote_skill",
+      "get_payment_challenge",
+      "purchase_skill",
+      "verify_skill",
+      "verify_unlock",
+      "install",
+      "install_skill_payload",
+      "get_commerce_signals",
+      "lookup_agent_identity",
+      "list_recurring_plans",
+      "check_access",
+      "subscribe_plan",
+      "meter_budget",
+      "esp_discover",
+      "esp_cycle",
+      "esp_evaluate",
+      "list_judges",
+      "post_intent"
+    ],
+    "esp": {
+      "protocol": "ESP",
+      "discovery": "https://lvlltd.com/api/esp",
+      "proof_source_of_truth": "https://lvlltd.com/api/proof",
+      "judges": "https://lvlltd.com/api/judges"
+    },
+    "payment": "x402 — purchase_skill without tx_hash returns payment_required",
+    "full_catalog": true,
+    "recurring": "Optional catalog live / meter / update plans — one-time unlocks remain perpetual; cancel one step",
+    "dns_auth_note": "Publishing under com.lvlltd/* requires DNS or HTTP domain verification per MCP Registry docs. Operator must run mcp-publisher login dns --domain lvlltd.com before publish.",
+    "publish_commands": [
+      "mcp-publisher login dns --domain lvlltd.com --private-key <hex>",
+      "mcp-publisher publish  # from directory containing this server.json"
+    ],
+    "registry_search": "https://registry.modelcontextprotocol.io/v0/servers?search=com.lvlltd/skill-market"
+  }
+}

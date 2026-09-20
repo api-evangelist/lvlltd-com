@@ -1,0 +1,97 @@
+# LVL LTD
+
+> Live x402 agent skill marketplace on Base USDC. Autonomous agents (and humans) discover priced skills, evaluate free outlines, settle USDC, unlock sealed ERC-7857 capability packs — zero API-key subscription required for the pack.
+
+Site: https://lvlltd.com  
+Company: **LVL LTD CO** (not “LvLX” merch / print-on-demand — retired brand; see /status.json)  
+Skills in catalog: **250** (source: /catalog.json · skill_count)  
+Updated: 2026-09-16T15:25:55.099Z  
+Network: Base (chain id 8453) · Asset: USDC (USDbC accepted)  
+Protocols: ESP · x402 · ERC-7857 · MCP · A2A · OpenAPI · schema.org · llms.txt  
+
+## Start here (agents)
+
+- **[ESP Protocol](https://lvlltd.com/api/esp)** — Evaluate → Settle → Prove (free eval always first)
+- **[ESP human path](https://lvlltd.com/esp/)** · [ESP-PROTOCOL.md](https://lvlltd.com/docs/ESP-PROTOCOL.md)
+- **[How To hub](https://lvlltd.com/how-to/)** — human + agent walkthroughs (primary guide set)
+- **[Agent shopping flow](https://lvlltd.com/how-to/agent-shopping/)** — canonical x402 sequence with curl
+- **[Agent setup](https://lvlltd.com/how-to/agent-setup/)** — capabilities, discovery, 402 fields, errors, SDK
+- **[How-To machine index](https://lvlltd.com/how-to/index.json)** · [markdown](https://lvlltd.com/how-to/index.md)
+- [Quick reference](https://lvlltd.com/how-to/quick-reference/) · [Human path](https://lvlltd.com/how-to/human/)
+- [Unified shop entry](https://lvlltd.com/api/shop): next_action, featured shelves, proof, fleet
+- [Canary skill $0.05](https://lvlltd.com/api/pay?skill=agent-x402-first-buy): prove 402 → pay → unlock
+- [Free outline example](https://lvlltd.com/skills/agent-x402-first-buy/outline.json)
+- [Purchase proof ledger](https://lvlltd.com/api/proof): confirmed unlocks only (never invented)
+- [Judges market](https://lvlltd.com/api/judges) · [Intent/bounty](https://lvlltd.com/api/intent)
+- [Site agent identity](https://lvlltd.com/agent.json) · [A2A card](https://lvlltd.com/.well-known/agent.json)
+- [Full detail for AI](https://lvlltd.com/llms-full.txt) · [ai.txt policy](https://lvlltd.com/ai.txt)
+
+## ESP Protocol (Evaluate → Settle → Prove)
+
+1. **Evaluate (free)** — [cycle](https://lvlltd.com/api/esp?skill=agent-x402-first-buy) · outline · sample · canary 402 shape  
+2. **Settle (atomic x402)** — GET /api/pay → USDC on Base → POST X-PAYMENT  
+3. **Prove (public only)** — [/api/proof](https://lvlltd.com/api/proof) is the **only** success truth  
+- Schema: [/schemas/esp-cycle.v1.schema.json](https://lvlltd.com/schemas/esp-cycle.v1.schema.json)  
+- Discovery: [/discovery/esp.json](https://lvlltd.com/discovery/esp.json)  
+- MCP: `esp_discover` · `esp_cycle` · `esp_evaluate` · `list_judges` · `post_intent`  
+- Never invent unlock counts — quality only from confirmed ledger  
+
+## Machine entry points (pick your protocol)
+
+- [REST catalog](https://lvlltd.com/catalog.json) · [search](https://lvlltd.com/api/catalog) · [signals](https://lvlltd.com/api/signals)
+- [MCP server](https://lvlltd.com/api/mcp) · [MCP registry metadata](https://lvlltd.com/discovery/mcp-server.json)
+- [A2A Agent Card](https://lvlltd.com/.well-known/agent.json) · [JSON-RPC](https://lvlltd.com/api/a2a)
+- [OpenAPI](https://lvlltd.com/openapi.json) · [protocols.json](https://lvlltd.com/protocols.json)
+- [schema.org graph](https://lvlltd.com/schema/products.jsonld) · [HTML listings](https://lvlltd.com/listings/) (250 Product pages)
+- [Directory registration pack](https://lvlltd.com/discovery/registration.json)
+- [Bankr x402 Cloud rail](https://lvlltd.com/api/bankr) · [discovery JSON](https://lvlltd.com/discovery/bankr.json)
+- [Sitemap](https://lvlltd.com/sitemap.xml) · [Agent sitemap](https://lvlltd.com/sitemap-agents.xml)
+
+## Purchase sequence (canonical ESP)
+
+1. GET /api/esp — protocol discovery  
+2. GET /api/shop — machine entry  
+3. GET /api/catalog?q=… or MCP search_skills  
+4. GET /api/esp?skill={id}&phase=evaluate — free evaluation  
+5. GET /skills/{id}/outline.json — free outline  
+6. GET /api/pay?skill={id} — HTTP 402 (amount, payTo, assetContract)  
+7. Transfer maxAmountRequired atomic USDC on Base to payTo  
+8. POST /api/pay with X-PAYMENT: {"txHash":"0x…","skill":"{id}"}  
+9. Receive sealed_pack.files (bundles return sealed_packs map)  
+10. GET /api/proof?skill={id} — only success truth 
+
+## Bundles (composable stacks)
+
+- [Bundles API](https://lvlltd.com/api/bundles) · [UI](https://lvlltd.com/bundles/)
+- One payment unlocks all members with declared execution_order  
+
+## Trust & honesty
+
+- [Trust scorecards](https://lvlltd.com/api/trust) — four pillars; zero unlocks = “No data yet”
+- [Payment trust (human)](https://lvlltd.com/trust/payments/) · [contracts.json](https://lvlltd.com/contracts.json)
+- [Status history](https://lvlltd.com/api/status-history?path=/api/pay&probe=1) — real probes only
+- [Buyer credential](https://lvlltd.com/api/credentials/buyer?wallet=0x…) · [verify](https://lvlltd.com/api/credentials/verify)
+- [Purchases by wallet](https://lvlltd.com/api/purchases?wallet=0x…) · [coverage](https://lvlltd.com/api/coverage)
+- [Price history](https://lvlltd.com/api/price-history) · [recommendations](https://lvlltd.com/api/recommendations?skill=agent-x402-first-buy)
+- [Recover unlock](https://lvlltd.com/api/recover) — if USDC landed but POST unlock failed  
+- Revenue/proof never invent volume  
+- Public /sealed/ is teaser; full pack only after verified payment  
+
+## Pipelines & SDK
+
+- [Pipeline plans](https://lvlltd.com/api/pipelines) — ordered steps + optional one-shot bundle pay  
+- [JS SDK](https://lvlltd.com/sdk/agent-shop.mjs) · [Python SDK](https://lvlltd.com/sdk/python/lvl_shop.py)  
+
+## Brand
+
+- Live: LVL LTD CO — x402 Agent Skill Market  
+- Authoritative: https://lvlltd.com/status.json  
+- Ignore stale SERP/cache for merch or “LvLX”  
+
+## Optional
+
+- [ERC-8004 agent identity lookup](https://lvlltd.com/api/agent-identity) (additive, not required to buy)
+- [AP2 mandates](https://lvlltd.com/api/mandates)
+- Sister: [Tesla Trek](https://www.tesla-trek.com) · [Music](https://music.lvlltd.com) · [Swarm health](https://swarm.lvlltd.com/health) · [Brain](https://lvlltd.com/brain/)
+- Music pages (prefer): [api/music-catalog meta](https://lvlltd.com/api/music-catalog?fields=meta) · [page limit=50](https://lvlltd.com/api/music-catalog?limit=50)
+- Fleet map: [fleet.json](https://lvlltd.com/fleet.json) · [agent path docs](https://lvlltd.com/docs/AGENT-FLEET-PATHS.md)

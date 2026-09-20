@@ -1,0 +1,103 @@
+generated: '2026-09-19'
+method: derived
+format: lvl-error-envelope
+source: >-
+  Derived from the 4xx responses declared in openapi/lvlltd-com-openapi.yml (400 on /api/esp; 402 on GET
+  and POST /api/pay; 403 on POST /api/pay) and enriched from the error-code table in
+  https://lvlltd.com/docs/REFERENCE.md, the agent-setup guide (https://lvlltd.com/how-to/agent-setup/),
+  the live 402 body observed on GET /api/pay?skill=agent-x402-first-buy, the JSON 404 envelope observed on
+  unknown /api/* paths, and the JSON-RPC code table published by GET https://lvlltd.com/api/a2a.
+rfc9457: false
+envelope:
+  media_type: application/json
+  shape: '{ "ok": false, "error": string (snake_case), "error_code": string (UPPER_SNAKE), "message": string, "retry": boolean?, "tip": string?, "health": url?, "catalog": url? }'
+  example_observed: '{"ok":false,"error":"not_found","path":"/api/docs","health":"https://lvlltd.com/api/health","catalog":"https://lvlltd.com/catalog.json"}'
+  note: >-
+    The 402 challenge is ALSO an "error" envelope (ok:false, error payment_required, error_code
+    PAYMENT_REQUIRED) but the docs are explicit that it is the price quote, not a failure; agents must not
+    abort on it. Under /api/* the provider promises JSON, never an HTML error page; HTML on /api/* is to be
+    treated as a 404.
+problems:
+- status: 400
+  error_code: SKILL_REQUIRED
+  title: Missing skill id
+  meaning: The skill query/body parameter is required and was not sent.
+  agent_action: Fix the query or body.
+  source_operation: 'openapi/lvlltd-com-openapi.yml#GET /api/esp (400 "Missing skill or unknown phase") + REFERENCE.md'
+- status: 400
+  error_code: null
+  title: Unknown ESP phase
+  meaning: phase must be one of evaluate, settle, prove, cycle.
+  source_operation: 'openapi/lvlltd-com-openapi.yml#GET /api/esp'
+- status: 402
+  error_code: PAYMENT_REQUIRED
+  title: Payment required (x402 challenge)
+  meaning: The GET challenge. Body and PAYMENT-REQUIRED / X-PAYMENT-REQUIRED headers carry maxAmountRequired (atomic USDC), payTo, network eip155:8453, assetContract, outline/sample links and an unsigned wallet_next_action.
+  agent_action: Parse the live challenge (top-level fields or accepts[0]), settle on Base, then POST with X-PAYMENT or PAYMENT-SIGNATURE. Never hard-code amounts or payTo from old docs.
+  source_operation: 'openapi/lvlltd-com-openapi.yml#GET /api/pay (402) — observed live 2026-09-19'
+- status: 402
+  error_code: PROOF_REQUIRED
+  title: Unlock POST without a payment proof
+  meaning: POST /api/pay arrived with no txHash / X-PAYMENT / PAYMENT-SIGNATURE.
+  agent_action: Include the X-PAYMENT JSON {txHash, skill}.
+  source_operation: 'openapi/lvlltd-com-openapi.yml#POST /api/pay (402) + REFERENCE.md'
+- status: 402
+  error_code: PAYMENT_VERIFICATION_FAILED
+  title: Payment could not be verified
+  meaning: Transaction not found, wrong amount, wrong payTo, wrong asset or wrong network. Body carries retry true and a tip.
+  agent_action: 'Wait 2-5 s after broadcast and retry with exponential backoff (2 s, 4 s, 8 s, up to ~30 s); confirm on BaseScan that the transfer is USDC on chain 8453 to the challenge payTo for exactly maxAmountRequired.'
+  source_operation: 'openapi/lvlltd-com-openapi.yml#POST /api/pay (402 "Payment required or verification failed") + REFERENCE.md'
+- status: 403
+  error_code: INVALID_LICENSE
+  title: Bad license token
+  meaning: The portable re-redeem token was rejected.
+  agent_action: Use the txHash path instead.
+  source_operation: REFERENCE.md
+- status: 403
+  error_code: AP2_MANDATE_REJECTED
+  title: AP2 mandate rejected
+  meaning: The optional X-AP2-MANDATE failed evaluation (limits, signature, expiry).
+  agent_action: Fix the mandate or omit the header (mandates are never required to buy).
+  source_operation: 'openapi/lvlltd-com-openapi.yml#POST /api/pay (403 "AP2 mandate rejected")'
+- status: 403
+  error_code: null
+  title: Not for sale
+  meaning: The skill is not purchasable.
+  agent_action: Stop; pick another skill.
+  source_operation: how-to/agent-setup
+- status: 404
+  error_code: not_found
+  title: Unknown API path
+  meaning: 'JSON envelope {ok:false, error:"not_found", path, health, catalog}; HTML is never returned under /api/*.'
+  agent_action: Check /api/health; treat any HTML body on /api/* as a 404.
+  source_operation: observed live on /api/docs, /api/openapi.json, /api/sandbox (2026-09-19)
+- status: 503
+  error_code: INTERNAL_ERROR
+  title: Edge failure
+  meaning: Transient failure in the Cloudflare Pages function.
+  agent_action: Retry with backoff; retry true when set.
+  source_operation: REFERENCE.md
+- status: 503
+  error_code: PAYMENTS_DISABLED
+  title: Payments disabled
+  meaning: The operator has set X402_LIVE=0.
+  agent_action: Wait; check /api/health payments.live and /api/ready.
+  source_operation: REFERENCE.md
+jsonrpc_errors:
+  endpoint: https://lvlltd.com/api/a2a
+  status_policy: HTTP 200 with a JSON-RPC error body; 400 only for a parse error; 429 on rate limit.
+  codes:
+  - {code: -32700, name: PARSE}
+  - {code: -32600, name: INVALID_REQUEST}
+  - {code: -32601, name: METHOD_NOT_FOUND}
+  - {code: -32602, name: INVALID_PARAMS}
+  - {code: -32603, name: INTERNAL}
+  - {code: -32001, name: TASK_NOT_FOUND, observed: 'tasks/get on an unknown id returned {"code":-32001,"message":"TaskNotFoundError","data":{"taskId":...}} on 2026-09-19'}
+  - {code: -32002, name: TASK_NOT_CANCELABLE}
+  - {code: -32004, name: UNSUPPORTED}
+  - {code: -32005, name: RATE_LIMIT}
+  - {code: -32006, name: VERSION_NOT_SUPPORTED}
+  source: GET https://lvlltd.com/api/a2a jsonrpc_transport.error_codes
+notes:
+- The OpenAPI declares no 401/429/5xx responses at all; the 429 and 503 behaviours above come from prose, not the contract.
+- Non-error signals an agent must not misread as failures: 402 on GET /api/pay (the quote), ready:false on /api/ready (rails degraded — do not buy), and an empty /api/proof (honest zero volume).

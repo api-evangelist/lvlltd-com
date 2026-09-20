@@ -1,23 +1,211 @@
 aid: lvlltd-com
 name: LVL LTD CO
-description: 'LVL LTD CO is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  LVL LTD CO is a sole-operator product lab in Cleveland, Georgia (operator Joseph Lamar Taylor; trade
+  name, LLC registration stated as pending) that runs lvlltd.com, an agent-native marketplace of 250
+  sealed AI-agent skill packs priced in USDC on Base (chain 8453) and settled over the x402 HTTP 402
+  protocol. Every skill has a free outline and sample; payment is proven by posting a Base transaction
+  hash (or an EIP-3009 PAYMENT-SIGNATURE) back to /api/pay, and the public /api/proof ledger is the
+  only success signal the operator will stand behind. The same catalog is exposed four ways: a 32-operation
+  OpenAPI 3.1.0 REST contract at /openapi.json, a remote MCP server at /api/mcp that answers an anonymous
+  tools/list with 59 tools, an Ed25519-JWS-signed A2A 1.0.0 agent card at /.well-known/agent-card.json
+  with a JSON-RPC endpoint at /api/a2a, and a full agent map in /llms.txt. Optional AP2 spend mandates,
+  ERC-8004 identity lookups, recurring catalog-access plans and a Coinbase CDP facilitator path sit on
+  top of the one-time unlock model.
 url: https://raw.githubusercontent.com/api-evangelist/lvlltd-com/refs/heads/main/apis.yml
+image: https://lvlltd.com/og-imagine.jpg
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Agents
+- Agent Commerce
+- Agent Skills
+- A2A
+- MCP
+- x402
+- Micropayments
+- Stablecoins
+- Marketplace
+- agent-native
+- United States
+tags_raw:
+- Agents
+- Agent commerce
+- Agent skills
+- A2A
+- MCP
+- x402
+- Micropayments
+- Stablecoins
+- Marketplace
+- Agent-native
+- United States
+apis:
+- aid: lvlltd-com:lvl-ltd-agent-skill-market-api
+  name: LVL LTD Agent Skill Market API
+  description: >-
+    REST contract for the x402 skill marketplace: health and readiness probes, the ESP
+    (Evaluate -> Settle -> Prove) protocol root, catalog search and the full catalog.json, free per-skill
+    outline.json and sample.md, the HTTP 402 payment challenge and X-PAYMENT unlock on /api/pay, the
+    public confirmed-unlock proof ledger, AP2 mandates, ERC-8004 agent identity, access resolution,
+    recurring plans, metered budgets, bundles, trust scorecards, security scans, eval scores, demand
+    signals and a revenue rollup. 32 operations across 26 paths, published as OpenAPI 3.1.0 at
+    https://lvlltd.com/openapi.json with servers[] https://lvlltd.com. The published spec carries no
+    operationIds and no securitySchemes; the overlay in overlays/ adds both.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com
+  tags:
+  - Agent Skills
+  - x402
+  - Micropayments
+  - Agent Commerce
+  - Marketplace
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-openapi.yml
+  - type: OpenAPI
+    name: LVL LTD Agent Skill Market API OpenAPI (provider-hosted)
+    url: https://lvlltd.com/openapi.json
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+  - type: Overlay
+    url: overlays/lvlltd-com-openapi-overlay.yaml
+- aid: lvlltd-com:lvl-ltd-mcp-server
+  name: LVL LTD MCP Server
+  description: >-
+    Remote Model Context Protocol server at https://lvlltd.com/api/mcp (alias /mcp; HTTP JSON-RPC,
+    protocol version 2025-06-18, serverInfo lvlltd-skill-market 1.1.0). initialize and tools/list answer
+    anonymously with 59 tools, each carrying a real inputSchema: catalog search and quoting, x402
+    purchase and unlock, proof verification, recurring plans and metering, the ESP and SCO protocol
+    tools, an A2A bridge (a2a_discover, a2a_message_send, a2a_tasks_get, a2a_tasks_cancel), agent
+    runtime helpers (KV memory, long-running tasks, event bus, decision receipts) and the Bankr x402
+    Cloud rail. Paid tools return a real 402 challenge rather than settling money inside MCP. A
+    registry-shaped server.json is published at /discovery/mcp-server.json.
+  humanURL: https://lvlltd.com/llms.txt
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - MCP
+  - agent-native
+  - Agent Commerce
+  properties:
+  - type: MCPServer
+    url: mcp/lvlltd-com-mcp.yml
+  - type: MCPServer
+    name: LVL LTD MCP endpoint (HTTP JSON-RPC)
+    url: https://lvlltd.com/api/mcp
+  - type: ToolCrosswalk
+    url: mcp/lvlltd-com-tool-crosswalk.yml
+- aid: lvlltd-com:lvl-ltd-a2a-agent
+  name: LVL LTD Skill Market A2A Agent
+  description: >-
+    Agent2Agent surface: an Ed25519-JWS-signed agent card (protocolVersion 1.0.0, JSONRPC transport,
+    version 1.5.0, JWKS at /.well-known/jwks.json) served from both /.well-known/agent-card.json and the
+    legacy /.well-known/agent.json, declaring eleven skills — catalog search, skill details, x402 price
+    quote and purchase, AP2 spending mandate and shopping-agent orchestration, explainability traces,
+    unlock verification, install guidance, ERC-8004 identity lookup, demand signals and an MCP bridge.
+    The JSON-RPC endpoint at https://lvlltd.com/api/a2a implements message/send, tasks/get, tasks/cancel
+    and tasks/list with an eight-turn multi-turn task store (TTL 1800 s); streaming and push
+    notifications are declared unsupported. Payment never settles inside A2A — it goes over x402 on
+    /api/pay.
+  humanURL: https://lvlltd.com/about/
+  baseURL: https://lvlltd.com/api/a2a
+  tags:
+  - A2A
+  - agent-native
+  - x402
+  properties:
+  - type: AgentCard
+    url: a2a/lvlltd-com-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted)
+    url: https://lvlltd.com/.well-known/agent-card.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/lvlltd-com-agentic-access.yml
+- type: VulnerabilityDisclosure
+  url: security/lvlltd-com-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/lvlltd-com-domain-security.yml
 - type: Website
   url: https://lvlltd.com/
+- type: Documentation
+  url: https://lvlltd.com/docs/
+- type: APIReference
+  url: https://lvlltd.com/docs/REFERENCE.md
+- type: GettingStarted
+  url: https://lvlltd.com/how-to/agent-setup/
+- type: Support
+  url: https://lvlltd.com/support/
+- type: GitHubOrganization
+  url: https://github.com/omgawdmadeit1
+- type: Pricing
+  url: https://lvlltd.com/pricing/
+- type: TermsOfService
+  url: https://lvlltd.com/terms/
+- type: PrivacyPolicy
+  url: https://lvlltd.com/privacy/
+- type: Security
+  url: https://lvlltd.com/security/
+- type: AgentCard
+  url: a2a/lvlltd-com-a2a.yml
+- type: MCPServer
+  url: mcp/lvlltd-com-mcp.yml
+- type: WellKnown
+  url: well-known/lvlltd-com-well-known.yml
+- type: SecurityTxt
+  url: well-known/lvlltd-com-security.txt
+- type: LLMsTxt
+  url: llms/lvlltd-com-llms.txt
+- type: Packages
+  url: packages/lvlltd-com-packages.yml
+- type: SDKs
+  url: packages/lvlltd-com-packages.yml
+- type: Conventions
+  url: conventions/lvlltd-com-conventions.yml
+- type: Idempotency
+  url: conventions/lvlltd-com-conventions.yml
+- type: ErrorCatalog
+  url: errors/lvlltd-com-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/lvlltd-com-lifecycle.yml
+- type: Conformance
+  url: conformance/lvlltd-com-conformance.yml
+- type: RateLimits
+  url: rate-limits/lvlltd-com-rate-limits.yml
+- type: Plans
+  url: plans/lvlltd-com-plans-pricing.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DataModel
+  url: data-model/lvlltd-com-data-model.yml
+- type: Roadmap
+  url: https://lvlltd.com/docs/AGENT-RAILS-2026.md
+- type: StatusPage
+  url: https://lvlltd.com/monitors/
+- type: Authentication
+  url: authentication/lvlltd-com-authentication.yml
+- type: OAuthScopes
+  url: scopes/lvlltd-com-scopes.yml
+- type: DataSubjectRequest
+  url: https://lvlltd.com/privacy/
+- type: Subprocessors
+  url: https://lvlltd.com/privacy/
+- type: ContentSignal
+  url: well-known/lvlltd-com-robots.txt
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 37
+  pass: local-v3

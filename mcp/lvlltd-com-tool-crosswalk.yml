@@ -1,0 +1,123 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived by aligning the live MCP tools/list (59 tools with inputSchema, fetched anonymously from
+  https://lvlltd.com/api/mcp on 2026-09-19, saved as mcp/lvlltd-com-mcp-tools-list.json) with the
+  provider's OpenAPI 3.1.0 (openapi/lvlltd-com-openapi.yml, 32 operations across 26 paths), and the A2A
+  card's eleven skills. The published spec has NO operationIds; the ids used in rest[] below are the ones
+  assigned by overlays/lvlltd-com-openapi-overlay.yaml (method + path is recorded on every row so the
+  binding can be checked against the original).
+purpose: >-
+  Bind each agent-facing MCP tool to the REST operation that backs it so the tool inherits that
+  operation's parameters as its real input contract, and record which tools have no public REST
+  operation at all. LVL's REST, MCP and A2A surfaces are overlapping-but-divergent projections of one
+  catalog: MCP is the widest (59 tools, of which 27 reach endpoints the OpenAPI never mentions), the
+  OpenAPI is the narrowest, and A2A is a curated eleven-skill front door that itself bridges to MCP.
+surfaces:
+  rest_openapi: openapi/lvlltd-com-openapi.yml
+  rest_note: 32 operations; no operationIds, no securitySchemes, no response schemas beyond a description; overlay adds ids + security.
+  mcp: https://lvlltd.com/api/mcp
+  mcp_note: tools/list answered 200 without credentials; every tool carries an inputSchema.
+  a2a: https://lvlltd.com/api/a2a
+  a2a_note: eleven skills in the card; a2a_discover / a2a_message_send / a2a_tasks_get / a2a_tasks_cancel MCP tools wrap this endpoint (mcpWrapsA2a), and the endpoint advertises the reverse (a2aWrapsMcp).
+  graphql: null
+crosswalk:
+- {tool: search_skills, category: catalog, rest: [searchCatalog], via: 'GET /api/catalog', binding: rest, confidence: high}
+- {tool: list_all_skills, category: catalog, rest: [getCatalog], via: 'GET /catalog.json', binding: rest, confidence: high, note: 'Tool paginates with offset/limit; catalog.json supports the same limit parameter and ETag.'}
+- {tool: intent_search, category: catalog, rest: [matchIntent], via: 'GET /api/intent', binding: rest, confidence: high}
+- {tool: get_skill_details, category: catalog, rest: [getSkillOutline, getSkillSample, getPaymentChallenge], via: 'GET /skills/{id}/outline.json + sample.md + /api/pay?skill=', binding: rest, confidence: medium, note: Composite — returns links to the three REST resources rather than one payload.}
+- {tool: get_payment_challenge, category: commerce, rest: [getPaymentChallenge], via: 'GET /api/pay?skill=', binding: rest, confidence: high}
+- {tool: quote_price, category: commerce, rest: [getPaymentChallenge], via: 'GET /api/pay?skill=', binding: rest, confidence: high, note: Declared alias of get_payment_challenge.}
+- {tool: quote_skill, category: commerce, rest: [getPaymentChallenge], via: 'GET /api/pay?skill=', binding: rest, confidence: high, note: Declared alias of quote_price.}
+- {tool: purchase_skill, category: commerce, rest: [getPaymentChallenge, unlockSealedPack], via: 'GET /api/pay (no tx_hash) -> POST /api/pay with X-PAYMENT (tx_hash)', binding: rest, confidence: high, note: The only MCP tool that moves value, and it does so by returning the 402 challenge; settlement happens on Base out of band.}
+- {tool: install_skill_payload, category: install, rest: [unlockSealedPack], via: 'POST /api/pay', binding: rest, confidence: medium, note: 'Description says it "routes through /api/pay"; the install-path shaping is server-side.'}
+- {tool: install, category: install, rest: [unlockSealedPack], via: 'POST /api/pay', binding: rest, confidence: medium, note: Declared alias of install_skill_payload.}
+- {tool: verify_unlock, category: proof, rest: [getProofLedger], via: 'GET /api/proof', binding: rest, confidence: high}
+- {tool: verify_skill, category: proof, rest: [getProofLedger], via: 'GET /api/proof', binding: rest, confidence: high, note: Declared alias of verify_unlock.}
+- {tool: get_proof, category: proof, rest: [getProofLedger], via: 'GET /api/proof', binding: rest, confidence: high}
+- {tool: get_commerce_signals, category: proof, rest: [getDemandSignals], via: 'GET /api/signals', binding: rest, confidence: high}
+- {tool: lookup_agent_identity, category: identity, rest: [getAgentIdentity], via: 'GET /api/agent-identity?address=', binding: rest, confidence: high}
+- {tool: get_security_scan, category: quality, rest: [getSecurityScan], via: 'GET /api/security', binding: rest, confidence: high}
+- {tool: get_eval_score, category: quality, rest: [getEvalScores], via: 'GET /api/eval', binding: rest, confidence: high}
+- {tool: list_recurring_plans, category: plans, rest: [listRecurringPlans], via: 'GET /api/subscribe', binding: rest, confidence: high}
+- {tool: check_access, category: plans, rest: [resolveAccess], via: 'GET /api/access?wallet=&skill=', binding: rest, confidence: high}
+- {tool: subscribe_plan, category: plans, rest: [manageSubscription], via: 'POST /api/subscribe', binding: rest, confidence: high, note: action=cancel is the one-step cancel the pricing page promises.}
+- {tool: meter_budget, category: plans, rest: [getMeterBudget, setMeterCapOrRecordUse], via: 'GET/POST /api/meter', binding: rest, confidence: high}
+- {tool: paid_api_call, category: commerce, rest: [getMeterBudget, setMeterCapOrRecordUse], via: 'GET/POST /api/meter', binding: rest, confidence: low, note: 'Description ("metered x402 API call ... records the paid call") matches the meter operations semantically; the exact path is not stated anywhere public.'}
+- {tool: a2a_discover, category: a2a-bridge, rest: [getAgentCard], via: 'GET /.well-known/agent.json', binding: rest, confidence: high}
+- {tool: a2a_message_send, category: a2a-bridge, rest: [a2aJsonRpc], via: 'POST /api/a2a message/send', binding: rest, confidence: high}
+- {tool: a2a_tasks_get, category: a2a-bridge, rest: [a2aJsonRpc], via: 'POST /api/a2a tasks/get', binding: rest, confidence: high}
+- {tool: a2a_tasks_cancel, category: a2a-bridge, rest: [a2aJsonRpc], via: 'POST /api/a2a tasks/cancel', binding: rest, confidence: high}
+- {tool: a2a_bridge_info, category: a2a-bridge, rest: [getA2aEndpointInfo], via: 'GET /api/a2a', binding: rest, confidence: medium, note: The GET body carries the mcp_bridge and dev_patterns blocks the tool summarises.}
+- {tool: esp_discover, category: esp, rest: [getEspProtocol], via: 'GET /api/esp', binding: rest, confidence: high}
+- {tool: esp_cycle, category: esp, rest: [getEspProtocol], via: 'GET /api/esp?skill=&phase=cycle', binding: rest, confidence: high}
+- {tool: esp_evaluate, category: esp, rest: [getEspProtocol], via: 'GET /api/esp?skill=&phase=evaluate', binding: rest, confidence: high}
+- {tool: list_judges, category: esp, rest: [listJudges], via: 'GET /api/judges', binding: rest, confidence: high}
+- {tool: get_ready, category: ops, rest: [getReadiness], via: 'GET /api/ready', binding: rest, confidence: high}
+mcp_only:
+- {tool: post_intent, reason: 'Posts a problem/bounty (success_criteria, bounty_usd). The OpenAPI only documents GET /api/intent (NL match); no POST or bounty operation is published.'}
+- {tool: get_fleet, reason: Backed by the static /fleet.json map, which is not in the OpenAPI.}
+- {tool: get_sandbox, reason: '/api/sandbox returned a JSON 404 on 2026-09-19 and is not in the OpenAPI; the tool describes "execution patterns", not a test environment.'}
+- {tool: get_networks, reason: '/api/networks answers 200 live but is not in the OpenAPI.'}
+- {tool: get_escrow_meta, reason: 'Open-market LVLEscrow contract metadata (/contracts.json escrow block); no REST operation in the spec.'}
+- {tool: get_capability_info, reason: '/api/capabilities returned a JSON 404; capability tokens are described only in MCP.'}
+- {tool: get_pack_meta, reason: '/api/packs?skill= is named in /api/health but not in the OpenAPI.'}
+- {tool: sco_discover, reason: 'SCO (Sealed Consensus Oracles) protocol at /api/sco answers 200 live but is absent from the OpenAPI.'}
+- {tool: sco_eval, reason: SCO surface — not in the OpenAPI.}
+- {tool: sco_canary, reason: SCO surface — not in the OpenAPI.}
+- {tool: sco_consensus, reason: SCO surface — not in the OpenAPI.}
+- {tool: sco_challenge, reason: SCO surface — not in the OpenAPI.}
+- {tool: sco_reputation, reason: SCO surface — not in the OpenAPI.}
+- {tool: receipt_verify, reason: DecisionReceipt verification has no REST operation in the spec (the /api/explain endpoint is related but distinct).}
+- {tool: receipt_mint, reason: DecisionReceipt minting has no REST operation in the spec.}
+- {tool: memory_remember, reason: 'Agent KV memory is sold as the "agent-memory" catalog skill with per-call x402 pricing; no REST operation is published.'}
+- {tool: memory_recall, reason: As memory_remember.}
+- {tool: memory_list, reason: As memory_remember.}
+- {tool: memory_forget, reason: As memory_remember.}
+- {tool: long_running_start, reason: Self-described "KV queue stub"; MCP-only.}
+- {tool: long_running_status, reason: As long_running_start.}
+- {tool: long_running_cancel, reason: As long_running_start.}
+- {tool: event_register, reason: Self-described "stub event bus"; MCP-only, and no webhook or AsyncAPI surface exists.}
+- {tool: event_list, reason: As event_register.}
+- {tool: event_trigger, reason: As event_register.}
+- {tool: bankr_rails, reason: 'Bankr x402 Cloud rail (/api/bankr, x402.bankr.bot) is a third-party hosted rail described in /api/x402; not in the OpenAPI.'}
+- {tool: bankr_quote, reason: As bankr_rails.}
+rest_only:
+- capability: liveness
+  operations: [getHealth]
+- capability: agent entry and discovery
+  operations: [getShop, getMcpServerInfo, getA2aEndpointInfo]
+  note: getA2aEndpointInfo is partially covered by a2a_bridge_info; getShop has no tool although llms.txt calls it the machine entry.
+- capability: JSON-RPC transports
+  operations: [mcpJsonRpc]
+  note: The MCP endpoint itself, documented as a REST path.
+- capability: AP2 mandates
+  operations: [listMandates, createOrRevokeMandate]
+  note: Mandates are an A2A skill (ap2_spending_mandate) and a REST pair, but no MCP tool.
+- capability: bundles
+  operations: [listBundles]
+- capability: trust and revenue
+  operations: [getTrustScorecards, getRevenueRollup]
+a2a_skill_bindings:
+- {skill: search_catalog, mcp: [search_skills, list_all_skills], rest: [searchCatalog]}
+- {skill: get_skill_details, mcp: [get_skill_details], rest: [getSkillOutline]}
+- {skill: quote_price, mcp: [quote_price], rest: [getPaymentChallenge]}
+- {skill: initiate_x402_purchase, mcp: [purchase_skill], rest: [unlockSealedPack]}
+- {skill: ap2_spending_mandate, mcp: [], rest: [createOrRevokeMandate, unlockSealedPack]}
+- {skill: ap2_shopping_agent, mcp: [], rest: [listMandates, createOrRevokeMandate, unlockSealedPack], note: 'Orchestration guidance; SDK /sdk/ap2-shopping-agent.mjs.'}
+- {skill: agent_explainability, mcp: [receipt_verify, receipt_mint], rest: [], note: 'POST /api/explain answers 200 live but is not in the OpenAPI.'}
+- {skill: verify_unlock, mcp: [verify_unlock], rest: [getProofLedger]}
+- {skill: install_skill, mcp: [install_skill_payload], rest: [unlockSealedPack], note: 'Also names "npx lvl-skills add", which is not published on npm.'}
+- {skill: lookup_agent_identity, mcp: [lookup_agent_identity], rest: [getAgentIdentity]}
+- {skill: commerce_signals, mcp: [get_commerce_signals], rest: [getDemandSignals]}
+- {skill: mcp_bridge, mcp: [a2a_bridge_info], rest: [getMcpServerInfo, mcpJsonRpc]}
+coverage:
+  mcp_tools_named: 59
+  mcp_tools_bound_to_rest: 32
+  mcp_only: 27
+  rest_operations_total: 32
+  rest_operations_with_a_tool: 23
+  rest_only: 9
+  a2a_skills: 11
+  a2a_skills_with_mcp_tool: 9
+  declared_alias_tools: 5

@@ -1,0 +1,47 @@
+generated: '2026-09-19'
+method: searched
+source: https://lvlltd.com/.well-known/oauth-protected-resource (RFC 9728 document, saved as well-known/lvlltd-com-oauth-protected-resource.json)
+docs: null
+summary: >-
+  LVL LTD publishes an OAuth scope LIST but no OAuth server. The RFC 9728 protected-resource document on
+  the apex declares four scopes_supported and names https://lvlltd.com as its authorization server, yet
+  that host serves neither /.well-known/oauth-authorization-server (404) nor
+  /.well-known/openid-configuration (404), the OpenAPI declares no oauth2 securityScheme, and no docs page
+  explains how a token would be obtained or which operation would accept one. derive-oauth-scopes.py
+  therefore found nothing in the spec. The scopes are recorded here because the provider published them;
+  they are, today, unobtainable.
+schemes:
+- name: declared-by-protected-resource-metadata
+  source: well-known/lvlltd-com-oauth-protected-resource.json
+  resource: https://lvlltd.com
+  authorization_servers: [https://lvlltd.com]
+  authorization_server_metadata: absent (RFC 8414 404; OIDC discovery 404) — verified 2026-09-19
+  bearer_methods_supported: [header]
+  flows: []
+scopes:
+- scope: agent:read
+  description: null
+  flows: []
+  sources: [well-known/lvlltd-com-oauth-protected-resource.json]
+  obtainable: false
+- scope: agent:execute
+  description: null
+  flows: []
+  sources: [well-known/lvlltd-com-oauth-protected-resource.json]
+  obtainable: false
+- scope: x402:pay
+  description: null
+  flows: []
+  sources: [well-known/lvlltd-com-oauth-protected-resource.json]
+  obtainable: false
+  note: The capability this scope names is in fact exercised without any token — by the X-PAYMENT / PAYMENT-SIGNATURE payment proof on POST /api/pay (see authentication/).
+- scope: openid
+  description: null
+  flows: []
+  sources: [well-known/lvlltd-com-oauth-protected-resource.json]
+  obtainable: false
+finding: >-
+  A dangling delegated-identity declaration: the resource document is the half of RFC 9728 a resource
+  server publishes, and it is well-formed, but the authorization-server half it points at does not
+  exist. An MCP client following the 2025-06-18 authorization flow would fetch this document, follow
+  authorization_servers[0], and fail at the metadata step.

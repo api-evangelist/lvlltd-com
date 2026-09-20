@@ -1,0 +1,17 @@
+{
+  "resource": "https://lvlltd.com",
+  "authorization_servers": [
+    "https://lvlltd.com"
+  ],
+  "scopes_supported": [
+    "agent:read",
+    "agent:execute",
+    "x402:pay",
+    "openid"
+  ],
+  "bearer_methods_supported": [
+    "header"
+  ],
+  "resource_documentation": "https://lvlltd.com/",
+  "resource_name": "LVL LTD Agent Marketplace API"
+}

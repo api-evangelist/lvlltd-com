@@ -1,0 +1,71 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://lvlltd.com/privacy/
+signals:
+  data_subject_request:
+    url: https://lvlltd.com/privacy/
+    section: '8. Your choices'
+    channel: X @OmgawdMadeit, GitHub omgawdmadeit1, or https://lvlltd.com/about/#contact (support@lvlltd.com)
+    rights_named: [access, deletion]
+    stated_sla: null
+    evidence:
+    - source: https://lvlltd.com/privacy/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Contact the operator via @OmgawdMadeit on X, GitHub, or the channels on /about/#contact for
+        access or deletion questions about off-chain records we control. Note: we cannot delete data
+        that is already committed to a public blockchain."
+    note: >-
+      A published channel for access and deletion requests, with an honest scoping statement about
+      on-chain data. No response SLA is stated for privacy requests specifically (the support page's
+      48-hour first-response target covers "security / privacy" tickets together).
+  subprocessors:
+    url: https://lvlltd.com/privacy/
+    section: '5. On-chain and third parties'
+    form: named third-party list inside the privacy policy (effective 24 July 2026), not a standalone dated subprocessor table
+    parties:
+    - {name: Cloudflare, role: 'hosting, CDN, edge functions, security tooling; request logs'}
+    - {name: Base / USDC (public blockchain), role: payment settlement — public by design}
+    - {name: 'Coinbase, MetaMask or similar (optional)', role: card-to-USDC funding partners; their own privacy policies apply}
+    evidence:
+    - source: https://lvlltd.com/privacy/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Base / USDC — payments settle on a public blockchain ... Cloudflare — hosting, CDN, edge
+        functions, and security tooling process requests to serve the site. Optional funding partners —
+        if you buy USDC with a card via Coinbase, MetaMask, or similar, that provider's privacy policy
+        applies to the card flow."
+probed_absent:
+- {url: https://lvlltd.com/accessibility, status: 404}
+- {url: https://lvlltd.com/accessibility/vpat, status: 404}
+- {url: https://lvlltd.com/legal/subprocessors, status: 404}
+- {url: https://lvlltd.com/legal/dpa, status: 404}
+- {url: https://lvlltd.com/privacy/requests, status: 404}
+- {url: https://lvlltd.com/transparency, status: 404}
+- {url: https://lvlltd.com/security/sbom, status: 404}
+- {url: https://lvlltd.com/docs/data-residency, status: 404}
+- {url: https://lvlltd.com/ai/transparency, status: 404}
+- {url: https://lvlltd.com/legal/report-content, status: 404}
+- {url: https://lvlltd.com/legal/, status: 404}
+not_recorded:
+- signal: age_assurance
+  reason: 'Privacy section 9 says the marketplace "is not directed at children under 16" — a statement of audience, not an age-assurance mechanism.'
+- signal: ai_transparency
+  reason: 'ai.txt and the robots.txt Content-Signal (ai-train=no) state the provider''s policy toward AI crawlers; they do not disclose AI use in the provider''s own products. /quality/ says some sealed payloads are "thin or generated" but there is no per-item AI-content label.'
+- signal: global_privacy_control
+  reason: No published statement; not tested by header.
+- signal: incident_notification
+  reason: No DPA and no breach-notification commitment published.
+- signal: data_residency
+  reason: 'Privacy section 10 says the service is operated from the United States and "may process data in regions where our infrastructure providers run" — no residency choice is offered.'
+- signal: transparency_report
+  reason: '/api/proof is a sales ledger, not a transparency report about legal requests or moderation.'
+- signal: exit_assistance
+  reason: Perpetual re-download of purchased packs is a licence term, not a switching/export commitment.
+- signal: support_lifetime
+  reason: No support period is stated anywhere.
+- signal: sbom
+  reason: Not published; never derived.

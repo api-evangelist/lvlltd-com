@@ -1,0 +1,395 @@
+{
+  "name": "LVL LTD Skill Market Agent",
+  "description": "LVL LTD CO operates lvlltd.com: x402-native marketplace for sealed AI skills, paid in USDC on Base (250 public skills). Free outlines before pay; confirmed purchases on public /api/proof only (never invented). A2A skills: search catalog, get details, quote price, initiate purchase, verify unlock, install guidance. Payment settles via x402 HTTP — not inside A2A JSON-RPC. Optional AP2 mandates and ERC-8004 identity are additive. Small product lab; honest identity: https://lvlltd.com/about/ · https://lvlltd.com/about.json",
+  "url": "https://lvlltd.com/api/a2a",
+  "provider": {
+    "organization": "LVL LTD CO",
+    "url": "https://lvlltd.com"
+  },
+  "version": "1.5.0",
+  "protocolVersion": "1.0.0",
+  "documentationUrl": "https://lvlltd.com/about/",
+  "iconUrl": "https://lvlltd.com/favicon.svg",
+  "preferredTransport": "JSONRPC",
+  "defaultInputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false,
+    "extendedAgentCard": false
+  },
+  "supportedInterfaces": [
+    {
+      "url": "https://lvlltd.com/api/a2a",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "securitySchemes": {
+    "x402_http": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-PAYMENT",
+      "description": "After GET /api/pay 402 challenge and Base USDC transfer, unlock with X-PAYMENT JSON {txHash, skill}"
+    },
+    "ap2_mandate": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-AP2-MANDATE",
+      "description": "Optional AP2 spend mandate. Present for verified_authorized_purchase; omit for legacy x402-only path."
+    }
+  },
+  "security": [],
+  "skills": [
+    {
+      "id": "search_catalog",
+      "name": "Search skill catalog",
+      "description": "Find any of 250 priced x402 skills by query, category, or max price. Free. Full catalog — not a subset.",
+      "tags": [
+        "discovery",
+        "catalog",
+        "x402",
+        "mcp"
+      ],
+      "examples": [
+        "Search for agent ops retry skills under $10",
+        "GET https://lvlltd.com/api/catalog?q=retry&max_price=10",
+        "MCP tools/call search_skills or list_all_skills"
+      ],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "get_skill_details",
+      "name": "Get skill details",
+      "description": "Return public skill card: price_label, free outline/sample URLs, security/eval if present. Does not unlock sealed content.",
+      "tags": [
+        "discovery",
+        "evaluation"
+      ],
+      "examples": [
+        "GET https://lvlltd.com/skills/agent-timeout-retry-policy/outline.json"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "quote_price",
+      "name": "Quote x402 price",
+      "description": "Return live HTTP 402 payment challenge for a skill_id (amount, payTo, USDC on Base). Free.",
+      "tags": [
+        "commerce",
+        "x402",
+        "quote"
+      ],
+      "examples": [
+        "GET https://lvlltd.com/api/pay?skill=agent-x402-first-buy"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "initiate_x402_purchase",
+      "name": "Purchase skill (x402)",
+      "description": "After on-chain USDC transfer, unlock sealed pack via POST /api/pay with X-PAYMENT. A2A does not settle payment. Optional X-AP2-MANDATE for authorized spend.",
+      "tags": [
+        "commerce",
+        "x402",
+        "purchase",
+        "ap2"
+      ],
+      "examples": [
+        "POST https://lvlltd.com/api/pay with X-PAYMENT after USDC transfer"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "ap2_spending_mandate",
+      "name": "AP2 spending mandate (A2A DataPart)",
+      "description": "Optional AP2 extension: human-signed spend limits for buyer agents. Transmit as A2A DataPart (spending_mandate/intent_mandate) and present X-AP2-MANDATE on /api/pay for verified_authorized_purchase. Does not replace x402 settlement.",
+      "tags": [
+        "ap2",
+        "mandate",
+        "a2a-extension",
+        "commerce"
+      ],
+      "examples": [
+        "POST /api/mandates to register EIP-191 signed mandate",
+        "A2A message/send with DataPart { spending_mandate: { mandate_id: 'md_…' } }",
+        "POST /api/pay with X-PAYMENT + X-AP2-MANDATE"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ]
+    },
+    {
+      "id": "ap2_shopping_agent",
+      "name": "AP2 Shopping Agent (buyer orchestrator)",
+      "description": "How Shopping Agents buy from LVL: capture intent, draft Intent Mandate for user EIP-191 sign, discover this merchant Agent Card, present mandate over A2A, settle via x402. SA never forges signatures or settles money inside A2A. SDK: /sdk/ap2-shopping-agent.mjs",
+      "tags": [
+        "ap2",
+        "shopping-agent",
+        "orchestrator",
+        "commerce"
+      ],
+      "examples": [
+        "A2A message/send text: shopping agent",
+        "import { Ap2ShoppingAgent } from 'https://lvlltd.com/sdk/ap2-shopping-agent.mjs'",
+        "POST /api/mandates action=evaluate before x402 unlock"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ]
+    },
+    {
+      "id": "agent_explainability",
+      "name": "Agent explainability (reasoning traces)",
+      "description": "Machine + human explainability for agent decisions: trace_id, steps, confidence, causal, counterfactual, human narrative, X-Agent-Explainability header. POST /api/explain. Never invents GMV — proof at /api/proof.",
+      "tags": [
+        "xai",
+        "explainability",
+        "audit",
+        "governance"
+      ],
+      "examples": [
+        "GET /api/explain",
+        "POST /api/explain {\"action\":\"shopping_plan\",\"text\":\"buy canary under $1 offline\"}",
+        "A2A message/send text: explainability"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ]
+    },
+    {
+      "id": "verify_unlock",
+      "name": "Verify purchase",
+      "description": "Check public /api/proof ledger for confirmed unlocks. Never invents volume.",
+      "tags": [
+        "trust",
+        "proof"
+      ],
+      "examples": [
+        "GET https://lvlltd.com/api/proof?skill=agent-x402-first-buy"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "install_skill",
+      "name": "Install unlocked skill",
+      "description": "After verified unlock, write sealed pack files and SKILL.md install paths (npx lvl-skills).",
+      "tags": [
+        "install",
+        "skills"
+      ],
+      "examples": [
+        "npx lvl-skills add <skill_id> --tx 0x..."
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ]
+    },
+    {
+      "id": "lookup_agent_identity",
+      "name": "ERC-8004 agent identity",
+      "description": "Lookup buyer/agent identity and local LVL reputation. Additive — never required to buy.",
+      "tags": [
+        "identity",
+        "erc-8004"
+      ],
+      "examples": [
+        "GET https://lvlltd.com/api/agent-identity?address=0x…"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "commerce_signals",
+      "name": "Commerce demand signals",
+      "description": "Rank skills by confirmed unlock demand (never fabricated volume).",
+      "tags": [
+        "trust",
+        "signals"
+      ],
+      "examples": [
+        "GET https://lvlltd.com/api/signals?sort=demand&limit=20"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "mcp_bridge",
+      "name": "MCP catalog tools",
+      "description": "Same marketplace tools via MCP JSON-RPC at /api/mcp for Claude/Cursor-class clients. Full catalog.",
+      "tags": [
+        "mcp",
+        "discovery"
+      ],
+      "examples": [
+        "POST https://lvlltd.com/api/mcp {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    }
+  ],
+  "additionalInterfaces": [
+    {
+      "url": "https://lvlltd.com/api/a2a",
+      "transport": "JSONRPC"
+    },
+    {
+      "url": "https://lvlltd.com/api/mcp",
+      "transport": "HTTP+JSON",
+      "protocol": "mcp"
+    },
+    {
+      "url": "https://lvlltd.com/api/shop",
+      "transport": "HTTP+JSON"
+    },
+    {
+      "url": "https://lvlltd.com/api/pay",
+      "transport": "HTTP+JSON",
+      "payment": "x402"
+    },
+    {
+      "url": "https://lvlltd.com/catalog.json",
+      "transport": "HTTP+JSON",
+      "note": "Full skill inventory (250)"
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": false,
+  "extensions": [
+    {
+      "uri": "https://lvlltd.com/protocols.json#a2a-marketplace-agent",
+      "description": "A2A Agent Card. Site-wide discovery: https://lvlltd.com/agent.json (different schema).",
+      "required": false
+    },
+    {
+      "uri": "https://lvlltd.com/api/mcp",
+      "description": "MCP HTTP endpoint — full catalog tools",
+      "required": false
+    },
+    {
+      "uri": "https://ap2-protocol.org/extension/v1",
+      "description": "AP2 Payment Extension (optional). Mandates as A2A DataParts; settlement via x402. See /protocols.json#ap2 and /api/mandates.",
+      "required": false
+    },
+    {
+      "uri": "https://lvlltd.com/protocols.json#ap2",
+      "description": "LVL AP2 map: optional X-AP2-MANDATE on /api/pay → verified_authorized_purchase. Does not replace x402.",
+      "required": false
+    },
+    {
+      "uri": "https://github.com/google-agentic-commerce/a2a-x402",
+      "description": "A2A x402 crypto settlement extension (industry). LVL implements x402 HTTP + optional AP2 mandate layer.",
+      "required": false
+    },
+    {
+      "uri": "https://lvlltd.com/.well-known/erc8004-agent.json",
+      "description": "ERC-8004 marketplace agent registration file",
+      "required": false
+    },
+    {
+      "uri": "https://lvlltd.com/catalog.json",
+      "description": "Single source of truth — 250 skills",
+      "required": false
+    },
+    {
+      "uri": "https://lvlltd.com/about.json",
+      "description": "Honest org/operator identity mirror (no invented credentials). Human page: /about/",
+      "required": false
+    }
+  ],
+  "catalogSkillCount": 250,
+  "about": {
+    "human": "https://lvlltd.com/about/",
+    "machine": "https://lvlltd.com/about.json",
+    "proof": "https://lvlltd.com/api/proof",
+    "status": "https://lvlltd.com/status.json"
+  },
+  "signatures": [
+    {
+      "scheme": "jws",
+      "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6Imx2bC1hMmEtMSIsInR5cCI6IkpXVCJ9",
+      "signature": "hGgXsqscnBBeJG17ZvDmP5VwVRYIp2Onbtd-e9MrIokyHOxgtDjhznVjokrTlAjiaJMjDxD5rgvPXF1-fvU4AA",
+      "header": {
+        "kid": "lvl-a2a-1",
+        "jwks": "https://lvlltd.com/.well-known/jwks.json"
+      }
+    }
+  ],
+  "signatureMeta": {
+    "alg": "EdDSA",
+    "jcs": true,
+    "signedAt": "2026-07-28T15:23:26.385Z",
+    "verify": "JWS over JCS(card without signatures); public key kid=lvl-a2a-1 in /.well-known/jwks.json",
+    "note": "Body updated for AP2 A2A extension URIs + ap2_spending_mandate skill; re-sign with secrets/a2a-ed25519-private.jwk (or A2A_SIGNING_PRIVATE_JWK) via node scripts/build-a2a-agent-card.mjs to refresh Ed25519 JWS."
+  },
+  "inventory": {
+    "skills": 250,
+    "premium": 144,
+    "source": "https://lvlltd.com/catalog.json",
+    "curated": 141,
+    "outline_only": 109
+  }
+}

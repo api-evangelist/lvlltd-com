@@ -1,0 +1,60 @@
+# LVL LTD — https://lvlltd.com
+# Brand: LVL LTD CO x402 agent skill market (NOT LvLX merch / POD)
+# Authoritative: /status.json · named operator: /operator/ /about/
+
+User-agent: *
+Allow: /
+
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
+Allow: /humans.txt
+Allow: /agent.json
+Allow: /catalog.json
+Allow: /catalog/
+Allow: /listings/
+Allow: /schema/
+Allow: /.well-known/
+Allow: /openapi.json
+Allow: /protocols.json
+Allow: /fleet.json
+Allow: /status.json
+Allow: /status/
+Allow: /about/
+Allow: /operator/
+Allow: /support/
+Allow: /refunds/
+Allow: /skill-quality/
+Allow: /security/
+Allow: /featured-shelf.json
+Allow: /docs/
+Allow: /learn/
+Allow: /api/
+Allow: /sdk/
+Allow: /skills/
+Allow: /discovery/
+Allow: /hub/marketplace
+Allow: /hub/marketplace/
+Allow: /sitemap.xml
+Allow: /sitemap-index.xml
+Allow: /sitemap-agents.xml
+Allow: /sitemap-trust.xml
+
+Allow: /skills/*/outline.json
+Allow: /skills/*/sample.md
+
+Content-Signal: ai-train=no, search=yes, ai-input=yes
+
+Sitemap: https://lvlltd.com/sitemap-index.xml
+Sitemap: https://lvlltd.com/sitemap.xml
+Sitemap: https://lvlltd.com/sitemap-agents.xml
+Sitemap: https://lvlltd.com/sitemap-trust.xml
+
+Disallow: /ops
+Disallow: /ops/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /profit
+Disallow: /profit/
+
+Host: https://lvlltd.com

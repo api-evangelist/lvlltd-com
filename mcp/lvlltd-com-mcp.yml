@@ -1,0 +1,126 @@
+generated: '2026-09-19'
+method: probed
+status: published
+source: https://lvlltd.com/api/mcp
+sources:
+- https://lvlltd.com/api/mcp (GET server info; POST initialize; POST tools/list — all answered 200 anonymously on 2026-09-19)
+- https://lvlltd.com/discovery/mcp-server.json (MCP registry server.json, schema 2025-07-09)
+- https://lvlltd.com/llms.txt
+- https://lvlltd.com/.well-known/erc8004-agent.json (names the MCP endpoint and protocol version)
+deployment:
+  mode: remote
+  endpoint: https://lvlltd.com/api/mcp
+  endpoint_alias: https://lvlltd.com/mcp
+  install: null
+  package: null
+  auth: none
+  verified: probed
+  note: >-
+    A plain HTTPS JSON-RPC endpoint: POST initialize and POST tools/list both answer without any
+    credential. The server.json calls the transport streamable-http; the live GET describes it as
+    http+json-rpc and the endpoint returned application/json (not text/event-stream) to our requests.
+    There is no stdio package: the "npx lvl-skills" CLI the initialize instructions and the agent card
+    mention is NOT published on npm (registry.npmjs.org/lvl-skills returned 404 on 2026-09-19), so the
+    only way to reach this provider over MCP is the remote endpoint.
+server:
+  name: lvlltd-skill-market
+  version: 1.1.0
+  protocol_version: '2025-06-18'
+  transport: http
+  url: https://lvlltd.com/api/mcp
+  capabilities: [tools, resources, prompts]
+  registry_name: com.lvlltd/skill-market
+  registry_server_json: mcp/lvlltd-com-mcp-server.json
+  registry_status: >-
+    PUBLISHED. registry.modelcontextprotocol.io/v0/servers?search=com.lvlltd/skill-market returned the
+    server on 2026-09-19 with _meta io.modelcontextprotocol.registry/official status "active"
+    (statusChangedAt 2026-08-09), version 1.5.0, remotes[0] streamable-http https://lvlltd.com/api/mcp.
+    The server.json's repository field points at https://github.com/lvlltd/lvlltd-agent-marketplace,
+    which does not exist (github.com/lvlltd and the repo path both return HTML 404); the operator's real
+    account is https://github.com/omgawdmadeit1, where lvlltd-agentic-marketplace and
+    lvlltd-skill-marketplace hold the source.
+  instructions_excerpt: >-
+    "LVL ESP skill market (Evaluate -> Settle -> Prove) + SCO (Sealed Consensus Oracles) + MCP + A2A + P2
+    rails + agent runtime. Preferred: esp_discover -> esp_evaluate|esp_cycle(skill) -> free outline ->
+    quote_skill -> pay USDC on Base (eip155:8453) -> purchase_skill|install_skill_payload(tx_hash) ->
+    verify_unlock (/api/proof only). ... Free eval before settlement. Never invent unlock counts."
+auth:
+  methods: [none]
+  note: >-
+    Discovery and every free tool are anonymous. Tools that unlock a sealed pack do not settle money inside
+    MCP: purchase_skill without tx_hash returns the x402 402 challenge (amount, payTo, asset) plus an
+    unsigned EIP-3009 wallet_next_action; the caller pays USDC on Base out of band and calls again with
+    tx_hash. No API key, OAuth or bearer token exists on this server. The /.well-known/oauth-protected-
+    resource document on the host names https://lvlltd.com as an authorization server, but that host
+    serves no RFC 8414 metadata (404) — see conformance/.
+tools_list:
+  file: mcp/lvlltd-com-mcp-tools-list.json
+  fetched: '2026-09-19'
+  http_status: 200
+  tool_count: 59
+  input_schemas: real (every tool carries inputSchema; required[] recorded per tool below)
+tool_count: 59
+tools:
+- {name: search_skills, category: catalog, description: Search the x402 skill catalog. Free. Returns price + free_eval URLs., required: []}
+- {name: get_skill_details, category: catalog, description: Public skill details + outline/sample/challenge links. Free., required: [skill_id]}
+- {name: get_payment_challenge, category: commerce, description: Live x402 402 challenge for a skill. Does not unlock., required: [skill_id]}
+- {name: quote_price, category: commerce, description: Alias of get_payment_challenge., required: [skill_id]}
+- {name: quote_skill, category: commerce, description: Alias of quote_price / get_payment_challenge., required: [skill_id]}
+- {name: list_all_skills, category: catalog, description: Paginated full catalog listing (offset/limit, max 200)., required: []}
+- {name: purchase_skill, category: commerce, description: Without tx_hash returns 402 + unsigned wallet_next_action; with tx_hash or payment payload unlocks the sealed pack., required: [skill_id]}
+- {name: verify_skill, category: proof, description: Alias of verify_unlock., required: []}
+- {name: verify_unlock, category: proof, description: Check the public /api/proof ledger for confirmed unlocks., required: []}
+- {name: install, category: install, description: Alias of install_skill_payload; requires tx_hash., required: [skill_id, tx_hash]}
+- {name: install_skill_payload, category: install, description: After purchase, sealed files + SKILL.md install paths (routes through /api/pay)., required: [skill_id, tx_hash]}
+- {name: get_commerce_signals, category: proof, description: Rank skills by confirmed unlock demand., required: []}
+- {name: lookup_agent_identity, category: identity, description: ERC-8004 / local identity lookup for a wallet., required: [address]}
+- {name: get_security_scan, category: quality, description: Published security scan for a skill., required: [skill_id]}
+- {name: get_eval_score, category: quality, description: Public eval suite pass rate if a suite exists., required: [skill_id]}
+- {name: intent_search, category: catalog, description: Natural-language goal -> ranked skills/stacks., required: [q]}
+- {name: list_recurring_plans, category: plans, description: List catalog live / update / bundle-renew / metered plans., required: []}
+- {name: check_access, category: plans, description: Resolve skill access (one_time_unlock > catalog_sub > bundle_renew > meter)., required: [wallet, skill_id]}
+- {name: subscribe_plan, category: plans, description: Without tx_hash 402 challenge for a plan; with tx_hash start/renew; action=cancel cancels., required: [plan_id, wallet]}
+- {name: a2a_discover, category: a2a-bridge, description: Fetch the marketplace Agent Card., required: []}
+- {name: a2a_message_send, category: a2a-bridge, description: Send message/send to the LVL A2A agent (multi-turn via task_id + context_id)., required: [text]}
+- {name: a2a_tasks_get, category: a2a-bridge, description: tasks/get by task id., required: [task_id]}
+- {name: a2a_tasks_cancel, category: a2a-bridge, description: tasks/cancel by task id., required: [task_id]}
+- {name: a2a_bridge_info, category: a2a-bridge, description: A2A<->MCP bridge topology., required: []}
+- {name: meter_budget, category: plans, description: Get or set spend cap; or quote metered per-call x402 for a skill., required: [wallet]}
+- {name: esp_discover, category: esp, description: ESP protocol root., required: []}
+- {name: esp_cycle, category: esp, description: Full ESP cycle for a skill., required: []}
+- {name: esp_evaluate, category: esp, description: ESP Evaluate phase only — free outline/sample/canary links., required: [skill_id]}
+- {name: sco_discover, category: sco, description: SCO (Sealed Consensus Oracles) protocol root., required: []}
+- {name: sco_eval, category: sco, description: Free evaluation for an oracle., required: [oracle_id]}
+- {name: sco_canary, category: sco, description: Parallel multi-provider canary., required: [oracle_id]}
+- {name: sco_consensus, category: sco, description: Aggregate sealed pack cids into a consensus pack., required: [input_cids]}
+- {name: sco_challenge, category: sco, description: File or resolve an economic challenge against a sealed SCO pack., required: []}
+- {name: sco_reputation, category: sco, description: Ledger-derived oracle reputation., required: [oracle_id]}
+- {name: list_judges, category: esp, description: Recursive evaluator market — judge/verifier/critic ESP skills., required: []}
+- {name: post_intent, category: esp, description: Post a root problem/intent with success_criteria and optional bounty_usd., required: [success_criteria]}
+- {name: get_ready, category: ops, description: Truthful readiness probe (/api/ready)., required: []}
+- {name: get_proof, category: proof, description: Public confirmed-only unlock ledger., required: []}
+- {name: get_fleet, category: ops, description: Fleet map (skills, open-market, music, swarm, studio)., required: []}
+- {name: get_sandbox, category: ops, description: Sandbox/execution patterns for purchased packs., required: []}
+- {name: get_networks, category: ops, description: Multi-chain / multi-asset / gas rails (Base live only)., required: []}
+- {name: get_escrow_meta, category: ops, description: Open-market multi-party escrow contract metadata (not skill payTo)., required: []}
+- {name: get_capability_info, category: ops, description: Short-lived capability token discovery., required: []}
+- {name: get_pack_meta, category: catalog, description: Public sealed pack metadata + sealed_pack_hash., required: [skill_id]}
+- {name: paid_api_call, category: commerce, description: Metered x402 API call (nothing over $5); without tx_hash a 402 quote., required: []}
+- {name: receipt_verify, category: runtime, description: Verify a lvl-decision-receipt-v1 integrity hash., required: [receipt]}
+- {name: receipt_mint, category: runtime, description: Mint a DecisionReceipt for an agent-side decision., required: [decision_point, verdict, reason_code]}
+- {name: memory_remember, category: runtime, description: Store a key/value in agent KV memory (TTL default 24h)., required: [key]}
+- {name: memory_recall, category: runtime, description: Recall a value from agent KV memory., required: [key]}
+- {name: memory_list, category: runtime, description: List keys in a memory namespace., required: []}
+- {name: memory_forget, category: runtime, description: Delete a key from agent KV memory., required: [key]}
+- {name: long_running_start, category: runtime, description: Start a long-running / background task (KV queue stub)., required: [goal]}
+- {name: long_running_status, category: runtime, description: Status of a long-running task., required: [task_id]}
+- {name: long_running_cancel, category: runtime, description: Cancel a long-running task., required: [task_id]}
+- {name: event_register, category: runtime, description: Register interest in a topic (stub event bus)., required: [topic]}
+- {name: event_list, category: runtime, description: List active event registrations for a topic., required: []}
+- {name: event_trigger, category: runtime, description: Trigger an event on a topic., required: [topic]}
+- {name: bankr_rails, category: bankr, description: Bankr x402 Cloud rail for LVL skills., required: []}
+- {name: bankr_quote, category: bankr, description: Bankr unlock URL + LVL 402 challenge URL for a skill., required: [skill_id]}
+notes:
+- Nine tools are declared aliases of another tool (quote_price, quote_skill, verify_skill, install, and the esp/sco discover pairs overlap); the distinct capability count is closer to 45.
+- Several tools describe themselves as stubs ("KV queue stub", "stub event bus"); the runtime family is a scaffold the operator labels as such, not a production event system.
+- The ERC-8004 registration file, the server.json, the agent card and llms.txt all name the same endpoint and protocol version, so the four discovery documents agree.

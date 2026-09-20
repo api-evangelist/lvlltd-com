@@ -1,0 +1,227 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for LVL LTD Agent Skill Market API
+  version: 1.0.0
+  description: Adds the operationIds, tags, securitySchemes and contact/terms metadata the published spec (https://lvlltd.com/openapi.json,
+    1.6.0) omits. Names come from the providers own docs; nothing is added that the docs do not describe.
+extends: openapi/lvlltd-com-openapi.yml
+x-generated: '2026-09-19'
+x-method: generated
+actions:
+- target: $.info
+  update:
+    x-apievangelist-enrichment:
+      generated: '2026-09-19'
+      provenance: API Evangelist overlay; the harvested spec is unchanged in openapi/_original/
+    termsOfService: https://lvlltd.com/terms/
+    contact:
+      name: LVL LTD CO
+      url: https://lvlltd.com
+      email: support@lvlltd.com
+    x-status-page: https://lvlltd.com/monitors/
+    x-llms-txt: https://lvlltd.com/llms.txt
+- target: $
+  update:
+    tags:
+    - name: Operations
+    - name: ESP Protocol
+    - name: Catalog
+    - name: Payments
+    - name: Proof
+    - name: MCP
+    - name: A2A
+    - name: AP2 Mandates
+    - name: Identity
+    - name: Plans
+    - name: Trust
+- target: $.components
+  update:
+    securitySchemes:
+      x402_payment_proof:
+        type: apiKey
+        in: header
+        name: X-PAYMENT
+        description: 'x402 payment proof after a GET /api/pay 402 challenge and a Base USDC transfer: JSON {"txHash":"0x…","skill":"<id>"}.
+          Idempotent on (txHash, skill).'
+      x402_payment_signature:
+        type: apiKey
+        in: header
+        name: PAYMENT-SIGNATURE
+        description: Signed EIP-3009 typed data (wallet_next_action from the 402) verified and settled through the Coinbase
+          CDP facilitator.
+      ap2_mandate:
+        type: apiKey
+        in: header
+        name: X-AP2-MANDATE
+        description: Optional AP2 Intent Mandate id or full mandate for verified_authorized_purchase.
+- target: $.paths['/api/pay'].post
+  update:
+    security:
+    - x402_payment_proof: []
+    - x402_payment_signature: []
+- target: $.paths['/api/pay'].get
+  update:
+    x-payment-challenge-headers:
+    - PAYMENT-REQUIRED
+    - X-PAYMENT-REQUIRED
+    x-note: HTTP 402 is the quote, not an error; agents read maxAmountRequired/payTo from the body or accepts[0].
+- target: $.paths['/api/health'].get
+  update:
+    operationId: getHealth
+    tags:
+    - Operations
+- target: $.paths['/api/ready'].get
+  update:
+    operationId: getReadiness
+    tags:
+    - Operations
+- target: $.paths['/api/esp'].get
+  update:
+    operationId: getEspProtocol
+    tags:
+    - ESP Protocol
+- target: $.paths['/api/judges'].get
+  update:
+    operationId: listJudges
+    tags:
+    - ESP Protocol
+- target: $.paths['/api/intent'].get
+  update:
+    operationId: matchIntent
+    tags:
+    - Catalog
+- target: $.paths['/api/shop'].get
+  update:
+    operationId: getShop
+    tags:
+    - Catalog
+- target: $.paths['/catalog.json'].get
+  update:
+    operationId: getCatalog
+    tags:
+    - Catalog
+- target: $.paths['/api/catalog'].get
+  update:
+    operationId: searchCatalog
+    tags:
+    - Catalog
+- target: $.paths['/api/pay'].get
+  update:
+    operationId: getPaymentChallenge
+    tags:
+    - Payments
+- target: $.paths['/api/pay'].post
+  update:
+    operationId: unlockSealedPack
+    tags:
+    - Payments
+- target: $.paths['/api/proof'].get
+  update:
+    operationId: getProofLedger
+    tags:
+    - Proof
+- target: $.paths['/api/mcp'].get
+  update:
+    operationId: getMcpServerInfo
+    tags:
+    - MCP
+- target: $.paths['/api/mcp'].post
+  update:
+    operationId: mcpJsonRpc
+    tags:
+    - MCP
+- target: $.paths['/api/a2a'].get
+  update:
+    operationId: getA2aEndpointInfo
+    tags:
+    - A2A
+- target: $.paths['/api/a2a'].post
+  update:
+    operationId: a2aJsonRpc
+    tags:
+    - A2A
+- target: $.paths['/.well-known/agent.json'].get
+  update:
+    operationId: getAgentCard
+    tags:
+    - A2A
+- target: $.paths['/api/mandates'].get
+  update:
+    operationId: listMandates
+    tags:
+    - AP2 Mandates
+- target: $.paths['/api/mandates'].post
+  update:
+    operationId: createOrRevokeMandate
+    tags:
+    - AP2 Mandates
+- target: $.paths['/api/agent-identity'].get
+  update:
+    operationId: getAgentIdentity
+    tags:
+    - Identity
+- target: $.paths['/api/access'].get
+  update:
+    operationId: resolveAccess
+    tags:
+    - Plans
+- target: $.paths['/api/subscribe'].get
+  update:
+    operationId: listRecurringPlans
+    tags:
+    - Plans
+- target: $.paths['/api/subscribe'].post
+  update:
+    operationId: manageSubscription
+    tags:
+    - Plans
+- target: $.paths['/api/meter'].get
+  update:
+    operationId: getMeterBudget
+    tags:
+    - Plans
+- target: $.paths['/api/meter'].post
+  update:
+    operationId: setMeterCapOrRecordUse
+    tags:
+    - Plans
+- target: $.paths['/api/bundles'].get
+  update:
+    operationId: listBundles
+    tags:
+    - Catalog
+- target: $.paths['/api/trust'].get
+  update:
+    operationId: getTrustScorecards
+    tags:
+    - Trust
+- target: $.paths['/api/security'].get
+  update:
+    operationId: getSecurityScan
+    tags:
+    - Trust
+- target: $.paths['/api/eval'].get
+  update:
+    operationId: getEvalScores
+    tags:
+    - Trust
+- target: $.paths['/api/signals'].get
+  update:
+    operationId: getDemandSignals
+    tags:
+    - Proof
+- target: $.paths['/api/revenue'].get
+  update:
+    operationId: getRevenueRollup
+    tags:
+    - Proof
+- target: $.paths['/skills/{id}/outline.json'].get
+  update:
+    operationId: getSkillOutline
+    tags:
+    - Catalog
+- target: $.paths['/skills/{id}/sample.md'].get
+  update:
+    operationId: getSkillSample
+    tags:
+    - Catalog

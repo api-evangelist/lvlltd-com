@@ -1,0 +1,74 @@
+generated: '2026-09-19'
+method: searched
+source: openapi/lvlltd-com-openapi.yml (declares NO securitySchemes; the X-PAYMENT and X-AP2-MANDATE header parameters on POST /api/pay are the only auth-shaped elements)
+docs:
+- https://lvlltd.com/docs/REFERENCE.md
+- https://lvlltd.com/how-to/agent-setup/
+- https://lvlltd.com/api/x402
+- https://lvlltd.com/.well-known/agent-card.json (securitySchemes x402_http, ap2_mandate)
+- https://lvlltd.com/.well-known/oauth-protected-resource
+- https://lvlltd.com/docs/AGENT-RAILS-2026.md ("Wallet-native buy — No API key required for first-party unlocks")
+summary:
+  types: [none, x402-payment-proof]
+  api_key_in: []
+  oauth2_flows: []
+  model: >-
+    Anonymous reads; payment proof instead of credentials for writes that deliver value. There are no
+    accounts, no API keys and no OAuth: an agent discovers, searches and evaluates with no header at all,
+    then proves a Base USDC payment on POST /api/pay. The provider's own documents call this
+    "wallet-native buy" and the MCP manifest's deployment.auth is none. derive-authentication.py found 0
+    schemes because the OpenAPI declares none; the overlay adds three header schemes so downstream
+    tooling can see them.
+schemes:
+- name: x402_payment_proof
+  type: apiKey
+  in: header
+  parameter: X-PAYMENT
+  purpose: payment proof, not identity
+  format: 'JSON {"txHash":"0x…","skill":"<id>"} (also accepted as the request body)'
+  obtained_by: GET /api/pay?skill=<id> -> HTTP 402 challenge -> ERC-20 USDC transfer on Base (eip155:8453) of maxAmountRequired to payTo -> the transaction hash
+  applies_to: [POST /api/pay (unlock), POST /api/recover, MCP purchase_skill / install_skill_payload / subscribe_plan tx_hash argument]
+  idempotent: true — same (txHash, skill) re-downloads the pack without re-charging
+  sources: [openapi/lvlltd-com-openapi.yml#POST /api/pay parameters.X-PAYMENT, a2a/lvlltd-com-agent-card.json securitySchemes.x402_http, https://lvlltd.com/docs/REFERENCE.md]
+- name: x402_payment_signature
+  type: apiKey
+  in: header
+  parameter: PAYMENT-SIGNATURE
+  purpose: signed payment authorization (no on-chain broadcast by the buyer)
+  format: EIP-3009 transferWithAuthorization typed data signed with eth_signTypedData_v4 from the 402's wallet_next_action
+  verified_by: Coinbase CDP x402 facilitator (https://api.cdp.coinbase.com/platform/v2/x402/verify + /settle) — "primary" path per /api/x402; on-chain receipt scan is the fallback
+  applies_to: [POST /api/pay]
+  sources: [https://lvlltd.com/api/x402, https://lvlltd.com/SKILL.md (step 5), CORS Access-Control-Allow-Headers on /api/pay]
+- name: ap2_mandate
+  type: apiKey
+  in: header
+  parameter: X-AP2-MANDATE
+  purpose: optional authorization layer (a human-signed spend mandate), never required to buy
+  format: mandate_id (md_…) or a full AP2 IntentMandate signed with EIP-191; registered via POST /api/mandates
+  applies_to: [POST /api/pay -> verified_authorized_purchase]
+  failure: 403 AP2_MANDATE_REJECTED
+  sources: [openapi/lvlltd-com-openapi.yml#POST /api/pay parameters.X-AP2-MANDATE, https://lvlltd.com/api/mandates]
+- name: capability_token
+  type: apiKey
+  in: header
+  parameter: X-CAPABILITY
+  purpose: short-lived capability token (P1 rail) — "not an API key for purchase"
+  status: described only by the MCP tool get_capability_info and the CORS allow-list; no issuance endpoint is documented (/api/capabilities 404)
+  sources: [mcp/lvlltd-com-mcp-tools-list.json#get_capability_info]
+- name: license_token
+  type: apiKey
+  in: body
+  parameter: license.token
+  purpose: optional portable re-redeem token returned by a successful unlock ("when KV bound"); 403 INVALID_LICENSE if bad
+  sources: [https://lvlltd.com/docs/REFERENCE.md#unlock-response-post--200]
+declared_but_absent:
+- name: OAuth 2.0 bearer
+  evidence: >-
+    /.well-known/oauth-protected-resource lists scopes_supported [agent:read, agent:execute, x402:pay,
+    openid] and bearer_methods_supported [header], and the /api/a2a CORS allow-list includes Authorization
+    — but the named authorization server (https://lvlltd.com) publishes no RFC 8414 or OIDC metadata,
+    no token endpoint exists, and no operation documents a bearer token. See scopes/lvlltd-com-scopes.yml.
+identity_note: >-
+  Identity, where it exists, is a wallet address: purchases, access resolution, meter budgets, mandates
+  and ERC-8004 lookups are all keyed on 0x addresses. Privacy policy section 8 recommends "a fresh wallet
+  if you prefer not to link purchases to a known address".

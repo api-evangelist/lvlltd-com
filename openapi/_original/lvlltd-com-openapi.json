@@ -1,0 +1,517 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LVL LTD Agent Skill Market API",
+    "version": "1.6.0",
+    "description": "ESP (Evaluate→Settle→Prove) + x402 skill marketplace. Free eval always before settlement. Success only via /api/proof. Source: catalog.json.",
+    "contact": {
+      "name": "LVL LTD CO",
+      "url": "https://lvlltd.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://lvlltd.com"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Liveness",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ready": {
+      "get": {
+        "summary": "Readiness",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/esp": {
+      "get": {
+        "summary": "ESP protocol — Evaluate → Settle → Prove",
+        "description": "Without skill: protocol root. With skill: full cycle. phase=evaluate|settle|prove for slices. Free evaluate never requires payment.",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phase",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "evaluate",
+                "settle",
+                "prove",
+                "cycle"
+              ]
+            }
+          },
+          {
+            "name": "tx",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional txHash when phase=prove"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ESP root, cycle, or phase slice"
+          },
+          "400": {
+            "description": "Missing skill or unknown phase"
+          }
+        }
+      }
+    },
+    "/api/judges": {
+      "get": {
+        "summary": "Recursive evaluator market (ESP judges)",
+        "description": "List judge/verifier/critic skills with quality derived only from public proof ledger.",
+        "responses": {
+          "200": {
+            "description": "Judge catalog"
+          }
+        }
+      }
+    },
+    "/api/intent": {
+      "get": {
+        "summary": "NL intent → ranked skills",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/shop": {
+      "get": {
+        "summary": "Unified agent entry",
+        "responses": {
+          "200": {
+            "description": "Shop payload"
+          }
+        }
+      }
+    },
+    "/catalog.json": {
+      "get": {
+        "summary": "Full skill catalog (source of truth)",
+        "description": "All 250 public skills with protocol surfaces",
+        "responses": {
+          "200": {
+            "description": "Catalog"
+          }
+        }
+      }
+    },
+    "/api/catalog": {
+      "get": {
+        "summary": "Search catalog",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Results"
+          }
+        }
+      }
+    },
+    "/api/pay": {
+      "get": {
+        "summary": "x402 payment challenge (HTTP 402)",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "402": {
+            "description": "Payment required challenge"
+          }
+        }
+      },
+      "post": {
+        "summary": "Unlock sealed pack after Base USDC payment",
+        "parameters": [
+          {
+            "name": "X-PAYMENT",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-AP2-MANDATE",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional AP2 mandate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unlocked sealed pack"
+          },
+          "402": {
+            "description": "Payment required or verification failed"
+          },
+          "403": {
+            "description": "AP2 mandate rejected"
+          }
+        }
+      }
+    },
+    "/api/proof": {
+      "get": {
+        "summary": "Confirmed unlock ledger (never fabricated)",
+        "responses": {
+          "200": {
+            "description": "Ledger"
+          }
+        }
+      }
+    },
+    "/api/mcp": {
+      "get": {
+        "summary": "MCP server info / tools list",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "MCP JSON-RPC",
+        "responses": {
+          "200": {
+            "description": "JSON-RPC result"
+          }
+        }
+      }
+    },
+    "/api/a2a": {
+      "get": {
+        "summary": "A2A agent card pointer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "A2A JSON-RPC",
+        "responses": {
+          "200": {
+            "description": "Task/Message"
+          }
+        }
+      }
+    },
+    "/.well-known/agent.json": {
+      "get": {
+        "summary": "Signed A2A Agent Card",
+        "responses": {
+          "200": {
+            "description": "Agent Card"
+          }
+        }
+      }
+    },
+    "/api/mandates": {
+      "get": {
+        "summary": "List AP2 mandates for wallet",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create/revoke AP2 mandate",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/agent-identity": {
+      "get": {
+        "summary": "ERC-8004 identity + local reputation (additive)",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Identity"
+          }
+        }
+      }
+    },
+    "/api/access": {
+      "get": {
+        "summary": "Access resolution (one-time / sub / meter)",
+        "parameters": [
+          {
+            "name": "wallet",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access decision"
+          }
+        }
+      }
+    },
+    "/api/subscribe": {
+      "get": {
+        "summary": "Recurring plans",
+        "responses": {
+          "200": {
+            "description": "Plans"
+          }
+        }
+      },
+      "post": {
+        "summary": "Start/renew/cancel subscription",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/meter": {
+      "get": {
+        "summary": "Meter budget / per-call challenge",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Set cap or record metered use",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bundles": {
+      "get": {
+        "summary": "Composable skill stacks",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/trust": {
+      "get": {
+        "summary": "Trust scorecards",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/security": {
+      "get": {
+        "summary": "Security scan results",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/eval": {
+      "get": {
+        "summary": "Eval suite scores",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/signals": {
+      "get": {
+        "summary": "Confirmed demand signals",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/revenue": {
+      "get": {
+        "summary": "Revenue rollup (confirmed only)",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/skills/{id}/outline.json": {
+      "get": {
+        "summary": "Free skill outline",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Outline"
+          }
+        }
+      }
+    },
+    "/skills/{id}/sample.md": {
+      "get": {
+        "summary": "Free skill sample",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sample"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Skill": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "price_usd",
+          "price_label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price_usd": {
+            "type": "number"
+          },
+          "price_label": {
+            "type": "string",
+            "pattern": "^\\$[0-9]"
+          },
+          "category": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "x402": {
+            "type": "object"
+          },
+          "protocols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-lvl-skill-count": 250,
+  "x-lvl-source-of-truth": "catalog.json"
+}

@@ -1,0 +1,119 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live probes on 2026-09-19 of https://lvlltd.com (402 challenge headers, /.well-known/*, MCP initialize,
+  A2A tasks/get) plus the harvested OpenAPI, agent card, x402 discovery documents and the catalog's own
+  standards block (catalog.json standards/protocol_stack; humans.txt "Standards: x402, ERC-7857, MCP,
+  A2A, OpenAPI, schema.org, llms.txt").
+summary: >-
+  LVL LTD's contract declares its market's standards in the documents themselves rather than on a
+  marketing page: x402 v2 (the domain standard for agent commerce, carried in the 402 challenge headers,
+  /.well-known/x402 and the OpenAPI's /api/pay responses), A2A 1.0.0 with the AP2 payment extension,
+  MCP 2025-06-18, EIP-3009/EIP-2612 payment signatures, ERC-8004 identity and ERC-7857 sealed packs, on
+  top of RFC 9116 security.txt and an RFC 9728 protected-resource document. What is missing is the
+  conventional web-API layer: no OAuth 2.0 / OIDC server behind the resource metadata it publishes, no
+  RFC 9457 problem details, no operationIds or securitySchemes in the OpenAPI, and the api-catalog is
+  served as text rather than linkset+json.
+domain_standard_signature:
+  standard: x402 (HTTP 402 Payment Required protocol, version 2)
+  market: agent commerce / machine-payable APIs
+  declared_in_contract: true
+  evidence:
+  - 'openapi/lvlltd-com-openapi.yml paths./api/pay.get.responses.402 ("x402 payment challenge (HTTP 402)") and paths./api/pay.post.parameters X-PAYMENT + X-AP2-MANDATE headers'
+  - 'live GET https://lvlltd.com/api/pay?skill=agent-x402-first-buy -> HTTP 402 with PAYMENT-REQUIRED and X-PAYMENT-REQUIRED headers (base64 JSON, x402Version 2, scheme exact, network eip155:8453, asset USDC, maxAmountRequired 50000, maxTimeoutSeconds 600)'
+  - 'https://lvlltd.com/.well-known/x402 (x402Version 2, payTo, resources[])'
+  - 'https://lvlltd.com/api/x402 names the Coinbase CDP facilitator verify/settle endpoints as the primary verification path'
+standards:
+- id: x402-v2
+  conforms: true
+  evidence: See domain_standard_signature. Both the 402 challenge shape (accepts[] with scheme/network/amount/asset/payTo) and the settlement headers (PAYMENT-SIGNATURE / X-PAYMENT) are implemented; verified live without paying.
+- id: a2a-1.0.0
+  conforms: true
+  evidence: Agent card graded conformant (a2a/lvlltd-com-a2a.yml); POST tasks/get on an unknown id returned the A2A-defined -32001 TaskNotFoundError with an X-Request-Id echo and X-RateLimit-Remaining header.
+- id: a2a-x402-extension
+  conforms: declared
+  evidence: 'Card extensions[] cites https://github.com/google-agentic-commerce/a2a-x402 ("LVL implements x402 HTTP + optional AP2 mandate layer") — but the card states payment settles over HTTP on /api/pay, not inside A2A, so the extension is referenced rather than implemented as an A2A DataPart flow.'
+- id: ap2-agent-payments-protocol
+  conforms: declared
+  evidence: 'Card extensions[] https://ap2-protocol.org/extension/v1; skills ap2_spending_mandate and ap2_shopping_agent; REST GET/POST /api/mandates (schema lvl-ap2-mandates-v1, mandate_type ap2.mandates.IntentMandate, EIP-191 signed); X-AP2-MANDATE header on POST /api/pay. Optional — never required to buy.'
+- id: mcp-2025-06-18
+  conforms: true
+  evidence: POST initialize returned protocolVersion 2025-06-18 with tools/resources/prompts capabilities; tools/list returned 59 tools with inputSchema; server listed on registry.modelcontextprotocol.io as com.lvlltd/skill-market (status active).
+- id: eip-3009-transfer-with-authorization
+  conforms: declared
+  evidence: '/api/x402 primary path: "PAYMENT-SIGNATURE / official X-PAYMENT payload -> Coinbase CDP Facilitator verify+settle"; MCP purchase_skill returns an "unsigned wallet_next_action (EIP-3009 PAYMENT-SIGNATURE template)". Not exercised (would require paying).'
+- id: eip-2612-permit
+  conforms: declared
+  evidence: '/api/x402 permit block (schema lvl-eip2612-discovery-v1, POST /api/permit build/assemble flow, USDC on Base name "USD Coin" version 2).'
+- id: erc-8004-agent-identity
+  conforms: declared
+  evidence: '/.well-known/erc8004-agent.json (type eip-8004#agent-registration, endpoints A2A/MCP/x402/OpenAPI/catalog, registrations [] — the file says on-chain AgentId registration is operator-opt-in and none is claimed); GET /api/agent-identity?address= in the OpenAPI.'
+- id: erc-7857-intelligent-nft
+  conforms: declared
+  evidence: 'catalog.json protocol_stack.nfts "ERC-7857" and protocol_note ("ERC-7857 Intelligent NFTs represent sealed agent capabilities"); nft_count 285. No on-chain contract address for the iNFTs is published in the harvested documents, so this is a self-description, not a verified deployment.'
+- id: rfc9116-security-txt
+  conforms: true
+  evidence: /.well-known/security.txt with Contact, Canonical, Policy, Acknowledgments, Preferred-Languages, Expires 2027-09-11T00:00:00.000Z (well-known/lvlltd-com-security.txt).
+- id: rfc9728-oauth-protected-resource
+  conforms: partial
+  evidence: >-
+    /.well-known/oauth-protected-resource is served with the required resource and authorization_servers
+    members plus scopes_supported and bearer_methods_supported — but authorization_servers[0]
+    (https://lvlltd.com) publishes neither /.well-known/oauth-authorization-server (404) nor
+    /.well-known/openid-configuration (404), so the document points at an authorization server that does
+    not exist. Nothing on the site actually accepts a bearer token.
+- id: rfc8414-oauth-authorization-server-metadata
+  conforms: false
+  evidence: 404 on lvlltd.com, studio, swarm and music hosts.
+- id: openid-connect-discovery
+  conforms: false
+  evidence: 404 on every host; "openid" appears only in the protected-resource scopes_supported list.
+- id: oauth2
+  conforms: false
+  evidence: No oauth2 securityScheme in the OpenAPI, no token endpoint, no documented OAuth flow. Access is anonymous for reads and payment-proof-gated for unlocks.
+- id: rfc9727-api-catalog
+  conforms: partial
+  evidence: '/.well-known/api-catalog answers 200 with fifteen RFC 8288 Link lines (rel service-desc, status, alternate, item, payment, collection, describedby, agent-card, jwks, about) but as text/plain, not the application/linkset+json media type RFC 9727 requires; /.well-known/api-catalog.json 404s.'
+- id: llms-txt
+  conforms: true
+  evidence: /llms.txt (and /.well-known/llms.txt, identical) in the llms.txt H1/blockquote/link-list shape; llms-full.txt also served.
+- id: openapi-3.1
+  conforms: true
+  evidence: 'https://lvlltd.com/openapi.json parses as OpenAPI 3.1.0 (26 paths, 32 operations). Quality gaps: zero operationIds, no components.securitySchemes, response objects carry only descriptions, one schema (Skill).'
+- id: json-rpc-2.0
+  conforms: true
+  evidence: Both /api/mcp and /api/a2a answer JSON-RPC 2.0 envelopes with standard -32xxx error codes; the A2A endpoint documents its code table (-32001 TASK_NOT_FOUND ... -32006 VERSION_NOT_SUPPORTED).
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: 'Errors are a custom envelope {ok:false, error, error_code, message, retry, tip} as application/json; see errors/lvlltd-com-problem-types.yml.'
+- id: content-signal
+  conforms: true
+  evidence: 'robots.txt line "Content-Signal: ai-train=no, search=yes, ai-input=yes" (well-known/lvlltd-com-robots.txt); ai.txt repeats ai-train no, search allow.'
+- id: jws-signed-agent-card
+  conforms: declared
+  evidence: >-
+    signatures[] carries an EdDSA JWS (kid lvl-a2a-1) resolvable at /.well-known/jwks.json. Our own
+    verification of the signature over JCS(card minus signatures) and over JCS(card minus signatures and
+    signatureMeta) did NOT validate; the card's signatureMeta note says the body was edited after signing
+    ("re-sign ... to refresh Ed25519 JWS"), which is consistent with a stale signature. Recorded as
+    declared, not verified.
+- id: pagination-offset-limit
+  conforms: true
+  evidence: 'catalog.json pagination block (total/offset/limit/count/next_offset/next_cursor, ETag + If-None-Match for 304); /api/catalog limit; MCP list_all_skills offset/limit (max 200).'
+- id: idempotency
+  conforms: partial
+  evidence: 'Unlock is idempotent on (txHash, skill) — re-POST returns the same sealed pack without re-charging (REFERENCE.md, terms section 3); A2A message/send is idempotent on message.messageId / X-Request-Id for 300 s. No Idempotency-Key header exists for subscribe, meter or mandate writes. See conventions/lvlltd-com-conventions.yml.'
+- id: fhir-r4
+  conforms: false
+- id: scim-2.0
+  conforms: false
+- id: odata
+  conforms: false
+- id: json-api
+  conforms: false
+compliance_program:
+  published: false
+  note: >-
+    No SOC 2 / ISO 27001 / PCI DSS / HIPAA / FedRAMP claim anywhere on the site; /quality/ and
+    /legal/trust-pack.json state "independently_audited: false" and "No published bug-bounty fund yet —
+    we will not invent one". No Compliance pointer is emitted.
