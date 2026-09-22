@@ -23,7 +23,7 @@ created: '2026-09-19'
 modified: '2026-09-19'
 tags:
 - Agents
-- Agent Commerce
+- Agentic Commerce
 - Agent Skills
 - A2A
 - MCP
@@ -45,6 +45,7 @@ tags_raw:
 - Marketplace
 - Agent-native
 - United States
+- Agent Commerce
 apis:
 - aid: lvlltd-com:lvl-ltd-agent-skill-market-api
   name: LVL LTD Agent Skill Market API
@@ -60,6 +61,12 @@ apis:
   humanURL: https://lvlltd.com/docs/
   baseURL: https://lvlltd.com
   tags:
+  - Agent Skills
+  - x402
+  - Micropayments
+  - Agentic Commerce
+  - Marketplace
+  tags_raw:
   - Agent Skills
   - x402
   - Micropayments
@@ -91,6 +98,10 @@ apis:
   humanURL: https://lvlltd.com/llms.txt
   baseURL: https://lvlltd.com/api/mcp
   tags:
+  - MCP
+  - agent-native
+  - Agentic Commerce
+  tags_raw:
   - MCP
   - agent-native
   - Agent Commerce
