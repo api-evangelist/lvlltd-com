@@ -1,0 +1,30 @@
+openapi: 3.2.0
+info:
+  title: Lvlltd Com Revenue API
+  version: 1.6.0
+  contact:
+    name: LVL LTD CO
+    url: https://lvlltd.com
+  description: 'Operations tagged Revenue across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://lvlltd.com
+tags:
+- name: Revenue
+paths:
+  /api/revenue:
+    get:
+      summary: Revenue rollup (confirmed only)
+      responses:
+        '200':
+          description: OK
+      tags:
+      - Revenue
+      operationId: getApiRevenue
+      x-operation-id-source: derived
+    servers:
+    - url: https://lvlltd.com
+x-refined-from:
+- lvlltd-com-openapi.json
+- lvlltd-com-openapi.yml
+x-lvl-skill-count: 250
+x-lvl-source-of-truth: catalog.json

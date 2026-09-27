@@ -1,0 +1,30 @@
+openapi: 3.2.0
+info:
+  title: Lvlltd Com Shop API
+  version: 1.6.0
+  contact:
+    name: LVL LTD CO
+    url: https://lvlltd.com
+  description: 'Operations tagged Shop across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://lvlltd.com
+tags:
+- name: Shop
+paths:
+  /api/shop:
+    get:
+      summary: Unified agent entry
+      responses:
+        '200':
+          description: Shop payload
+      tags:
+      - Shop
+      operationId: getApiShop
+      x-operation-id-source: derived
+    servers:
+    - url: https://lvlltd.com
+x-refined-from:
+- lvlltd-com-openapi.json
+- lvlltd-com-openapi.yml
+x-lvl-skill-count: 250
+x-lvl-source-of-truth: catalog.json

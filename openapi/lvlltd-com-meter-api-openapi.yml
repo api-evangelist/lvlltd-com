@@ -1,0 +1,39 @@
+openapi: 3.2.0
+info:
+  title: Lvlltd Com Meter API
+  version: 1.6.0
+  contact:
+    name: LVL LTD CO
+    url: https://lvlltd.com
+  description: 'Operations tagged Meter across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://lvlltd.com
+tags:
+- name: Meter
+paths:
+  /api/meter:
+    get:
+      summary: Meter budget / per-call challenge
+      responses:
+        '200':
+          description: OK
+      tags:
+      - Meter
+      operationId: getApiMeter
+      x-operation-id-source: derived
+    post:
+      summary: Set cap or record metered use
+      responses:
+        '200':
+          description: OK
+      tags:
+      - Meter
+      operationId: postApiMeter
+      x-operation-id-source: derived
+    servers:
+    - url: https://lvlltd.com
+x-refined-from:
+- lvlltd-com-openapi.json
+- lvlltd-com-openapi.yml
+x-lvl-skill-count: 250
+x-lvl-source-of-truth: catalog.json

@@ -31,7 +31,7 @@ tags:
 - Micropayments
 - Stablecoins
 - Marketplace
-- agent-native
+- Agent-Native
 - United States
 tags_raw:
 - Agents
@@ -46,60 +46,23 @@ tags_raw:
 - Agent-native
 - United States
 - Agent Commerce
+- agent-native
 apis:
-- aid: lvlltd-com:lvl-ltd-agent-skill-market-api
-  name: LVL LTD Agent Skill Market API
-  description: >-
-    REST contract for the x402 skill marketplace: health and readiness probes, the ESP
-    (Evaluate -> Settle -> Prove) protocol root, catalog search and the full catalog.json, free per-skill
-    outline.json and sample.md, the HTTP 402 payment challenge and X-PAYMENT unlock on /api/pay, the
-    public confirmed-unlock proof ledger, AP2 mandates, ERC-8004 agent identity, access resolution,
-    recurring plans, metered budgets, bundles, trust scorecards, security scans, eval scores, demand
-    signals and a revenue rollup. 32 operations across 26 paths, published as OpenAPI 3.1.0 at
-    https://lvlltd.com/openapi.json with servers[] https://lvlltd.com. The published spec carries no
-    operationIds and no securitySchemes; the overlay in overlays/ adds both.
-  humanURL: https://lvlltd.com/docs/
-  baseURL: https://lvlltd.com
-  tags:
-  - Agent Skills
-  - x402
-  - Micropayments
-  - Agentic Commerce
-  - Marketplace
-  tags_raw:
-  - Agent Skills
-  - x402
-  - Micropayments
-  - Agent Commerce
-  - Marketplace
-  properties:
-  - type: OpenAPI
-    url: openapi/lvlltd-com-openapi.yml
-  - type: OpenAPI
-    name: LVL LTD Agent Skill Market API OpenAPI (provider-hosted)
-    url: https://lvlltd.com/openapi.json
-  - type: Documentation
-    url: https://lvlltd.com/docs/
-  - type: APIReference
-    url: https://lvlltd.com/docs/REFERENCE.md
-  - type: Overlay
-    url: overlays/lvlltd-com-openapi-overlay.yaml
 - aid: lvlltd-com:lvl-ltd-mcp-server
   name: LVL LTD MCP Server
   description: >-
-    Remote Model Context Protocol server at https://lvlltd.com/api/mcp (alias /mcp; HTTP JSON-RPC,
-    protocol version 2025-06-18, serverInfo lvlltd-skill-market 1.1.0). initialize and tools/list answer
-    anonymously with 59 tools, each carrying a real inputSchema: catalog search and quoting, x402
-    purchase and unlock, proof verification, recurring plans and metering, the ESP and SCO protocol
-    tools, an A2A bridge (a2a_discover, a2a_message_send, a2a_tasks_get, a2a_tasks_cancel), agent
-    runtime helpers (KV memory, long-running tasks, event bus, decision receipts) and the Bankr x402
-    Cloud rail. Paid tools return a real 402 challenge rather than settling money inside MCP. A
-    registry-shaped server.json is published at /discovery/mcp-server.json.
+    Remote Model Context Protocol server at https://lvlltd.com/api/mcp (alias /mcp; HTTP JSON-RPC, protocol
+    version 2025-06-18, serverInfo lvlltd-skill-market 1.1.0). initialize and tools/list answer anonymously
+    with 59 tools, each carrying a real inputSchema: catalog search and quoting, x402 purchase and unlock,
+    proof verification, recurring plans and metering, the ESP and SCO protocol tools, an A2A bridge (a2a_discover,
+    a2a_message_send, a2a_tasks_get, a2a_tasks_cancel), agent runtime helpers (KV memory, long-running
+    tasks, event bus, decision receipts) and the Bankr x402 Cloud rail. Paid tools return a real 402 challenge
+    rather than settling money inside MCP. A registry-shaped server.json is published at /discovery/mcp-server.json.
   humanURL: https://lvlltd.com/llms.txt
   baseURL: https://lvlltd.com/api/mcp
   tags:
   - MCP
-  - agent-native
+  - Agent-Native
   - Agentic Commerce
   tags_raw:
   - MCP
@@ -116,18 +79,21 @@ apis:
 - aid: lvlltd-com:lvl-ltd-a2a-agent
   name: LVL LTD Skill Market A2A Agent
   description: >-
-    Agent2Agent surface: an Ed25519-JWS-signed agent card (protocolVersion 1.0.0, JSONRPC transport,
-    version 1.5.0, JWKS at /.well-known/jwks.json) served from both /.well-known/agent-card.json and the
-    legacy /.well-known/agent.json, declaring eleven skills — catalog search, skill details, x402 price
-    quote and purchase, AP2 spending mandate and shopping-agent orchestration, explainability traces,
-    unlock verification, install guidance, ERC-8004 identity lookup, demand signals and an MCP bridge.
-    The JSON-RPC endpoint at https://lvlltd.com/api/a2a implements message/send, tasks/get, tasks/cancel
-    and tasks/list with an eight-turn multi-turn task store (TTL 1800 s); streaming and push
-    notifications are declared unsupported. Payment never settles inside A2A — it goes over x402 on
-    /api/pay.
+    Agent2Agent surface: an Ed25519-JWS-signed agent card (protocolVersion 1.0.0, JSONRPC transport, version
+    1.5.0, JWKS at /.well-known/jwks.json) served from both /.well-known/agent-card.json and the legacy
+    /.well-known/agent.json, declaring eleven skills — catalog search, skill details, x402 price quote
+    and purchase, AP2 spending mandate and shopping-agent orchestration, explainability traces, unlock
+    verification, install guidance, ERC-8004 identity lookup, demand signals and an MCP bridge. The JSON-RPC
+    endpoint at https://lvlltd.com/api/a2a implements message/send, tasks/get, tasks/cancel and tasks/list
+    with an eight-turn multi-turn task store (TTL 1800 s); streaming and push notifications are declared
+    unsupported. Payment never settles inside A2A — it goes over x402 on /api/pay.
   humanURL: https://lvlltd.com/about/
   baseURL: https://lvlltd.com/api/a2a
   tags:
+  - A2A
+  - Agent-Native
+  - x402
+  tags_raw:
   - A2A
   - agent-native
   - x402
@@ -137,12 +103,364 @@ apis:
   - type: AgentCard
     name: A2A Agent Card (provider-hosted)
     url: https://lvlltd.com/.well-known/agent-card.json
+- aid: lvlltd-com:lvlltd-com-a2a-api
+  name: LVL LTD CO A2a API
+  description: The A2a API from LVL LTD CO — 1 operation(s) for a2a.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - A2a
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-a2a-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-access-api
+  name: LVL LTD CO Access API
+  description: The Access API from LVL LTD CO — 1 operation(s) for access.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Access
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-access-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-agent-identity-api
+  name: LVL LTD CO Agent Identity API
+  description: The Agent Identity API from LVL LTD CO — 1 operation(s) for agent identity.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Agent Identity
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-agent-identity-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-bundles-api
+  name: LVL LTD CO Bundles API
+  description: The Bundles API from LVL LTD CO — 1 operation(s) for bundles.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Bundles
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-bundles-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-catalog-api
+  name: LVL LTD CO Catalog API
+  description: The Catalog API from LVL LTD CO — 1 operation(s) for catalog.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Catalog
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-catalog-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-catalog-json-api
+  name: LVL LTD CO Catalog.json API
+  description: The Catalog.json API from LVL LTD CO — 1 operation(s) for catalog.json.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Catalog.json
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-catalog-json-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-esp-api
+  name: LVL LTD CO Esp API
+  description: The Esp API from LVL LTD CO — 1 operation(s) for esp.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Esp
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-esp-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-eval-api
+  name: LVL LTD CO Eval API
+  description: The Eval API from LVL LTD CO — 1 operation(s) for eval.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Eval
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-eval-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-health-api
+  name: LVL LTD CO Health API
+  description: The Health API from LVL LTD CO — 1 operation(s) for health.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-health-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-intent-api
+  name: LVL LTD CO Intent API
+  description: The Intent API from LVL LTD CO — 1 operation(s) for intent.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Intent
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-intent-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-judges-api
+  name: LVL LTD CO Judges API
+  description: The Judges API from LVL LTD CO — 1 operation(s) for judges.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Judges
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-judges-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-mandates-api
+  name: LVL LTD CO Mandates API
+  description: The Mandates API from LVL LTD CO — 1 operation(s) for mandates.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Mandates
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-mandates-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-mcp-api
+  name: LVL LTD CO MCP API
+  description: The Mcp API from LVL LTD CO — 1 operation(s) for mcp.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Mcp
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-mcp-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-meter-api
+  name: LVL LTD CO Meter API
+  description: The Meter API from LVL LTD CO — 1 operation(s) for meter.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Meter
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-meter-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-pay-api
+  name: LVL LTD CO Pay API
+  description: The Pay API from LVL LTD CO — 1 operation(s) for pay.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Pay
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-pay-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-proof-api
+  name: LVL LTD CO Proof API
+  description: The Proof API from LVL LTD CO — 1 operation(s) for proof.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Proof
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-proof-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-ready-api
+  name: LVL LTD CO Ready API
+  description: The Ready API from LVL LTD CO — 1 operation(s) for ready.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Ready
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-ready-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-revenue-api
+  name: LVL LTD CO Revenue API
+  description: The Revenue API from LVL LTD CO — 1 operation(s) for revenue.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Revenue
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-revenue-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-security-api
+  name: LVL LTD CO Security API
+  description: The Security API from LVL LTD CO — 1 operation(s) for security.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Security
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-security-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-shop-api
+  name: LVL LTD CO Shop API
+  description: The Shop API from LVL LTD CO — 1 operation(s) for shop.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Shop
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-shop-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-signals-api
+  name: LVL LTD CO Signals API
+  description: The Signals API from LVL LTD CO — 1 operation(s) for signals.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Signals
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-signals-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-skills-api
+  name: LVL LTD CO Skills API
+  description: The Skills API from LVL LTD CO — 2 operation(s) for skills.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Skills
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-skills-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-subscribe-api
+  name: LVL LTD CO Subscribe API
+  description: The Subscribe API from LVL LTD CO — 1 operation(s) for subscribe.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Subscribe
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-subscribe-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-trust-api
+  name: LVL LTD CO Trust API
+  description: The Trust API from LVL LTD CO — 1 operation(s) for trust.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - Trust
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-trust-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
+- aid: lvlltd-com:lvlltd-com-well-known-api
+  name: LVL LTD CO .well Known API
+  description: The .well Known API from LVL LTD CO — 1 operation(s) for .well known.
+  humanURL: https://lvlltd.com/docs/
+  baseURL: https://lvlltd.com/api/mcp
+  tags:
+  - .well Known
+  properties:
+  - type: OpenAPI
+    url: openapi/lvlltd-com-well-known-api-openapi.yml
+  - type: Documentation
+    url: https://lvlltd.com/docs/
+  - type: APIReference
+    url: https://lvlltd.com/docs/REFERENCE.md
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/lvlltd-com-openapi-overlay.yaml
 - type: AgenticAccess
   url: agentic-access/lvlltd-com-agentic-access.yml
 - type: VulnerabilityDisclosure
@@ -220,3 +538,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 37
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://lvlltd.com/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "1.0.0"
+  control: 404

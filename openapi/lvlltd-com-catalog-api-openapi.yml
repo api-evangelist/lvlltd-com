@@ -1,0 +1,47 @@
+openapi: 3.2.0
+info:
+  title: Lvlltd Com Catalog API
+  version: 1.6.0
+  contact:
+    name: LVL LTD CO
+    url: https://lvlltd.com
+  description: 'Operations tagged Catalog across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://lvlltd.com
+tags:
+- name: Catalog
+paths:
+  /api/catalog:
+    get:
+      summary: Search catalog
+      parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: category
+        in: query
+        schema:
+          type: string
+      - name: max_price
+        in: query
+        schema:
+          type: number
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Results
+      tags:
+      - Catalog
+      operationId: getApiCatalog
+      x-operation-id-source: derived
+    servers:
+    - url: https://lvlltd.com
+x-refined-from:
+- lvlltd-com-openapi.json
+- lvlltd-com-openapi.yml
+x-lvl-skill-count: 250
+x-lvl-source-of-truth: catalog.json

@@ -1,0 +1,52 @@
+openapi: 3.2.0
+info:
+  title: Lvlltd Com Esp API
+  version: 1.6.0
+  contact:
+    name: LVL LTD CO
+    url: https://lvlltd.com
+  description: 'Operations tagged Esp across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://lvlltd.com
+tags:
+- name: Esp
+paths:
+  /api/esp:
+    get:
+      summary: ESP protocol — Evaluate → Settle → Prove
+      description: 'Without skill: protocol root. With skill: full cycle. phase=evaluate|settle|prove for slices. Free evaluate never requires payment.'
+      parameters:
+      - name: skill
+        in: query
+        schema:
+          type: string
+      - name: phase
+        in: query
+        schema:
+          type: string
+          enum:
+          - evaluate
+          - settle
+          - prove
+          - cycle
+      - name: tx
+        in: query
+        schema:
+          type: string
+        description: Optional txHash when phase=prove
+      responses:
+        '200':
+          description: ESP root, cycle, or phase slice
+        '400':
+          description: Missing skill or unknown phase
+      tags:
+      - Esp
+      operationId: getApiEsp
+      x-operation-id-source: derived
+    servers:
+    - url: https://lvlltd.com
+x-refined-from:
+- lvlltd-com-openapi.json
+- lvlltd-com-openapi.yml
+x-lvl-skill-count: 250
+x-lvl-source-of-truth: catalog.json
