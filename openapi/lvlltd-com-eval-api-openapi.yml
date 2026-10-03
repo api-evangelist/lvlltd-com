@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Lvlltd Com Eval API
+  title: LVL LTD Agent Skill Market Eval API
   version: 1.6.0
+  description: 'ESP (Evaluate→Settle→Prove) + x402 skill marketplace. Free eval always before settlement. Success only via /api/proof. Source: catalog.json.'
   contact:
     name: LVL LTD CO
     url: https://lvlltd.com
-  description: 'Operations tagged Eval across 2 of this provider''s published API definitions: lvlltd-com-openapi.json, lvlltd-com-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://lvlltd.com
 tags:
@@ -21,10 +21,5 @@ paths:
       - Eval
       operationId: getApiEval
       x-operation-id-source: derived
-    servers:
-    - url: https://lvlltd.com
-x-refined-from:
-- lvlltd-com-openapi.json
-- lvlltd-com-openapi.yml
 x-lvl-skill-count: 250
 x-lvl-source-of-truth: catalog.json
