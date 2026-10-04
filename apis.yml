@@ -109,6 +109,8 @@ apis:
   humanURL: https://lvlltd.com/docs/
   baseURL: https://lvlltd.com/api/mcp
   tags:
+  - A2A
+  tags_raw:
   - A2a
   properties:
   - type: OpenAPI
@@ -193,6 +195,8 @@ apis:
   humanURL: https://lvlltd.com/docs/
   baseURL: https://lvlltd.com/api/mcp
   tags:
+  - ESP Провайдеры
+  tags_raw:
   - Esp
   properties:
   - type: OpenAPI
@@ -235,6 +239,8 @@ apis:
   humanURL: https://lvlltd.com/docs/
   baseURL: https://lvlltd.com/api/mcp
   tags:
+  - Intents
+  tags_raw:
   - Intent
   properties:
   - type: OpenAPI
@@ -277,6 +283,8 @@ apis:
   humanURL: https://lvlltd.com/docs/
   baseURL: https://lvlltd.com/api/mcp
   tags:
+  - MCP
+  tags_raw:
   - Mcp
   properties:
   - type: OpenAPI
@@ -459,6 +467,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/lvlltd-com-capability-edges.yml
+  name: LVL LTD CO Business Capability Map
 - type: Overlay
   url: overlays/lvlltd-com-openapi-overlay.yaml
 - type: AgenticAccess
