@@ -1,0 +1,48 @@
+slug: lvlltd-com
+provider: LVL LTD CO
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 3
+edges:
+- tag: Subscribe
+  spec_file: lvlltd-com-subscribe-api-openapi.yml
+  capability_id: BC-4240
+  capability_id_l1: BC-4240
+  capability_name: Subscription Lifecycle Management
+  confidence: 0.85
+  evidence: GET /api/subscribe "Recurring plans"; POST /api/subscribe "Start/renew/cancel subscription"
+  reason: Operations plainly manage recurring subscription plans and the start/renew/cancel lifecycle,
+    so Subscription Lifecycle Management at L1; spans provisioning, renewal and cancellation so no single
+    L2 is named.
+- tag: Meter
+  spec_file: lvlltd-com-meter-api-openapi.yml
+  capability_id: BC-4250.10
+  capability_id_l1: BC-4250
+  capability_name: Usage Metering
+  confidence: 0.75
+  evidence: POST /api/meter — "Set cap or record metered use"; GET /api/meter — "Meter budget / per-call
+    challenge"
+  reason: Recording metered use and tracking spend caps per call is ingestion and aggregation of usage
+    events feeding charging — Usage Metering. Slight ambiguity because the cap/budget aspect also resembles
+    quota enforcement.
+- tag: Pay
+  spec_file: lvlltd-com-pay-api-openapi.yml
+  capability_id: BC-4250.40
+  capability_id_l1: BC-4250
+  capability_name: Payment Collection & Dunning
+  confidence: 0.7
+  evidence: GET /api/pay — "x402 payment challenge (HTTP 402)"; POST /api/pay — "Unlock sealed pack after
+    Base USDC payment"
+  reason: These operations issue a payment challenge and collect/verify an on-chain USDC payment before
+    releasing the purchased artefact — payment authorisation and collection. Mapped to the billing L1's
+    payment collection sub-capability, with moderate confidence because this is one-off purchase settlement
+    rather than recurring subscription dunning.
