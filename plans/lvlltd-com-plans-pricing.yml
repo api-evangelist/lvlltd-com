@@ -107,3 +107,80 @@ notes:
 - 'catalog_basis in /api/subscribe: skill_count 250, list_sum_usd 217.03, median 0.99, mean 0.87, flagship_max 0.99 (generated 2026-09-16).'
 - '/docs/X402-UNLOCK.md still quotes $24.99 for seller-agent / buyer-agent / generational-agent; SKILL.md warns "do not advertise $49 while 402 is 990000" — the live 402 challenge, not any document, is the price of record.'
 - Gas (ETH on Base) is the buyer's cost and is not part of any price.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  - one-time
+  - subscription
+  units:
+  - money
+  - request
+  plans:
+  - name: One-time sealed pack unlock (per skill)
+    access: other
+    model: one-time
+    model_how: stated
+    units:
+    - other
+    - request
+    periods:
+    - one-time
+    - per-use
+  - name: Catalog Live · Starter
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - money
+    - request
+    periods:
+    - month
+  - name: Catalog Live · Pro
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - request
+    periods:
+    - month
+  - name: Catalog Live · Fleet
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - other
+    - request
+    periods:
+    - month
+  - name: Update Pass · All Owned Skills
+    access: other
+    model: subscription
+    model_how: stated
+    units: []
+    periods: []
+  - name: Networking Full Loop · Renewing
+    access: other
+    model: subscription
+    model_how: stated
+    units: []
+    periods: []
+  - name: Pay-per-use (default meter)
+    access: other
+    model: metered
+    model_how: stated
+    units: []
+    periods: []
+  - name: Skill bundles (composable stacks)
+    access: other
+    model: one-time
+    model_how: stated
+    units: []
+    periods: []
+  - name: Quiet Close (Stripe digital file)
+    access: other
+    model: one-time
+    model_how: stated
+    units: []
+    periods: []
