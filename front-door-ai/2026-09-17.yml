@@ -1,0 +1,34 @@
+# Front Door AI Index — lvlltd-com — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: lvlltd-com
+  lexicon_version: '1.0'
+  probed_at: '2026-09-25'
+  host: lvlltd.com
+  final_host: lvlltd.com
+  ownership: own
+  owner: lvlltd-com
+  shares_host_with: null
+  inherited_from: null
+  alias_of: null
+  verdict: scored
+  score: 27
+  band: 6
+  band_label: dominant
+  host_score: 27
+  density: 13.24
+  words: 2039
+  tiers:
+    agentic: 15
+    core: 12
+    model: 0
+  ambiguous: 49
+  top_terms:
+    agent: 49
+    AI: 12
+    AI agent: 9
+    llms.txt: 3
+    agentic: 1
+    autonomous agent: 1
+    prompts: 1
