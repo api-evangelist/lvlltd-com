@@ -52,3 +52,9 @@ paths:
       x-operation-id-source: derived
 x-lvl-skill-count: 250
 x-lvl-source-of-truth: catalog.json
+x-provenance:
+  method: harvested
+  publisher: LVL LTD CO
+  source: https://lvlltd.com/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
